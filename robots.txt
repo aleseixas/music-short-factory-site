@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://aleseixas.github.io/music-short-factory-site/sitemap.xml
