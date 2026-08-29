@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Privacy Policy | Além do Hit</title>
-  <meta name="description" content="How Além do Hit may process website, support, creator content, authorization, publishing, and technical data, and how to request deletion.">
+  <meta name="description" content="How Além do Hit handles creator content, TikTok authorization, essential sessions, draft uploads, support information, and deletion requests.">
   <meta name="theme-color" content="#090b0b">
   <link rel="canonical" href="https://aleseixas.github.io/music-short-factory-site/privacy.html">
   <meta property="og:type" content="website">
@@ -26,7 +26,7 @@
     <div class="wrap header-inner">
       <a class="brand" href="index.html" aria-label="Além do Hit home"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-copy"><strong>Além do Hit</strong><small>Music stories with context</small></span></a>
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Toggle navigation"><span></span></button>
-      <nav class="site-nav" id="primary-navigation" aria-label="Primary" data-open="false"><a href="index.html">Home</a><a href="about.html">About &amp; How It Works</a><a class="nav-contact" href="support.html">Support</a></nav>
+      <nav class="site-nav" id="primary-navigation" aria-label="Primary" data-open="false"><a href="index.html">Home</a><a href="about.html">About &amp; How It Works</a><a href="support.html">Support</a><a class="nav-contact" href="app.html">Open creator tool</a></nav>
     </div>
   </header>
 
@@ -35,8 +35,8 @@
       <div class="wrap page-hero-inner">
         <p class="eyebrow">Privacy</p>
         <h1 id="privacy-title">Privacy Policy</h1>
-        <p class="lead">This Policy explains what information Além do Hit may process through its public website, support communications, internal Music Short Factory workflow, and authorized platform integrations.</p>
-        <div class="page-meta" role="group" aria-label="Document dates"><span>Effective August 28, 2026</span><span>Last updated August 28, 2026</span></div>
+        <p class="lead">This Policy explains what information Além do Hit processes through its public pages, the Music Short Factory creator tool, support communications, and the authorized TikTok draft-upload integration.</p>
+        <div class="page-meta" role="group" aria-label="Document dates"><span>Effective August 28, 2026</span><span>Last updated August 29, 2026</span></div>
       </div>
     </section>
 
@@ -44,78 +44,86 @@
       <div class="wrap legal-layout">
         <nav class="legal-toc" aria-label="On this page">
           <strong>On this page</strong>
-          <a href="#scope">Scope</a><a href="#data">Data we may process</a><a href="#uses">How data is used</a><a href="#tiktok">TikTok integration</a><a href="#sharing">Sharing</a><a href="#retention">Retention</a><a href="#security">Security</a><a href="#website">Public website</a><a href="#choices">Your choices</a><a href="#children">Children</a><a href="#changes">Changes</a><a href="#contact">Contact</a>
+          <a href="#scope">Scope</a><a href="#data">Data we process</a><a href="#uses">How data is used</a><a href="#tiktok">TikTok integration</a><a href="#cookies">Cookies</a><a href="#sharing">Sharing</a><a href="#retention">Retention</a><a href="#security">Security</a><a href="#website">Public pages</a><a href="#choices">Your choices</a><a href="#children">Children</a><a href="#changes">Changes</a><a href="#contact">Contact</a>
         </nav>
 
         <article class="prose">
-          <div class="notice"><strong>At a glance.</strong> Além do Hit uses data only for the purposes described below. Personal information and TikTok user data are not sold. The public website has no account system, upload form, advertising tracker, or live publishing interface.</div>
+          <div class="notice"><strong>At a glance.</strong> Além do Hit uses data only to operate the creator-requested workflow described below. TikTok tokens are encrypted on the server, uploaded videos are temporary, and no video is transferred without explicit confirmation. Personal information and TikTok user data are not sold.</div>
 
           <h2 id="scope">1. Scope</h2>
-          <p>This Privacy Policy applies to the Além do Hit website, support communications, the internal Music Short Factory production workflow, and supported platform integrations operated for the project. Music Short Factory is a working name for the internal desktop workflow; Além do Hit is the primary public brand.</p>
-          <p>Third-party platforms, including TikTok and GitHub, process information under their own terms and privacy policies.</p>
+          <p>This Privacy Policy applies to the Além do Hit public pages, support communications, the Music Short Factory web workflow, its minimum secure backend, and the TikTok connection operated for the creator tool. Além do Hit is the primary public brand; Music Short Factory is the creation and draft-delivery workflow.</p>
+          <p>Third-party services, including TikTok and the providers used to host the public pages and backend, process information under their own terms and privacy policies.</p>
 
-          <h2 id="data">2. Information we may process</h2>
+          <h2 id="data">2. Information we process</h2>
           <p>The information processed depends on which parts of the project or integration a creator chooses to use.</p>
           <div class="table-wrap"><table><thead><tr><th scope="col">Category</th><th scope="col">Examples</th></tr></thead><tbody>
             <tr><td><strong>Support information</strong></td><td>Your email address and the information you include in a support, privacy, or deletion request.</td></tr>
-            <tr><td><strong>Creator materials</strong></td><td>Research notes, scripts, selected assets, narration, captions, images, videos, and related production files chosen for the workflow.</td></tr>
-            <tr><td><strong>Authorized TikTok account information</strong></td><td>TikTok account identifiers and limited basic profile information returned for an account that the creator authorizes.</td></tr>
-            <tr><td><strong>Authorization information</strong></td><td>OAuth authorization credentials, permission grants, connection state, and expiration information needed for an authorized integration.</td></tr>
-            <tr><td><strong>Publishing content and choices</strong></td><td>Videos, titles, captions, hashtags, destination account, privacy choices, and supported interaction settings selected by the creator.</td></tr>
-            <tr><td><strong>Operational information</strong></td><td>Publishing identifiers and status, timestamps, application events, diagnostic messages, security events, and technical logs needed to operate and troubleshoot a requested action.</td></tr>
+            <tr><td><strong>Essential session information</strong></td><td>An opaque session identifier stored in a secure cookie, anti-forgery data, session timestamps, and connection state. The cookie does not contain a TikTok access token.</td></tr>
+            <tr><td><strong>Creator materials</strong></td><td>The video file a creator deliberately selects for preview and draft upload, plus basic file information needed to validate and transfer it.</td></tr>
+            <tr><td><strong>Authorized TikTok account information</strong></td><td>TikTok account identifiers and limited basic profile information returned under <code>user.info.basic</code> for the account the creator authorizes.</td></tr>
+            <tr><td><strong>Authorization information</strong></td><td>OAuth access and refresh tokens, granted scopes, expiration, and connection state. Tokens are encrypted on the server using authenticated encryption.</td></tr>
+            <tr><td><strong>Draft upload information</strong></td><td>The video selected by the creator, TikTok upload identifier, upload status, and timestamps associated with the transfer.</td></tr>
+            <tr><td><strong>Operational information</strong></td><td>Application events, non-sensitive diagnostic messages, request metadata, security events, and technical logs needed to operate and troubleshoot the service.</td></tr>
           </tbody></table></div>
           <p>Do not send passwords, authorization codes, tokens, client secrets, or other unnecessary credentials in a support message.</p>
 
           <h2 id="uses">3. How information is used</h2>
           <p>Information may be used to:</p>
           <ul>
-            <li>organize research, scripts, production assets, videos, and metadata selected by the creator;</li>
+            <li>provide and protect the creator's essential session;</li>
+            <li>support a browser-local preview and, only after explicit confirmation, receive, validate, and temporarily stage the video selected by the creator;</li>
             <li>identify and authenticate a platform account authorized by the creator;</li>
-            <li>prepare or carry out a content upload or publication requested and confirmed by the creator;</li>
-            <li>display relevant account and publishing choices and check processing status;</li>
+            <li>carry out a TikTok draft upload requested and explicitly confirmed by the creator;</li>
+            <li>display the authorized account and check draft-upload status;</li>
             <li>provide support and respond to privacy or deletion requests;</li>
             <li>maintain security, diagnose errors, prevent misuse, and improve reliability; and</li>
             <li>comply with applicable legal obligations and enforce the <a href="terms.html">Terms of Service</a>.</li>
           </ul>
 
           <h2 id="tiktok">4. TikTok integration</h2>
-          <p>Além do Hit is being integrated with the TikTok Content Posting API. If the integration is enabled and a creator chooses to use it, TikTok's authorization process is used to connect a creator-selected account. The application may then process limited basic account information, OAuth authorization credentials, the video and caption prepared by the creator, available publishing settings, and status or diagnostic information necessary for the creator-requested operation.</p>
-          <p>Content must not be sent to a TikTok account that has not authorized access. The intended Direct Post experience keeps the authorized destination, content preview, editable caption or title, available privacy and interaction choices, and final confirmation visible to the creator.</p>
-          <p>Confidential credentials are not placed in this public website. This static GitHub Pages site does not perform TikTok login, token exchange, uploads, or publishing.</p>
+          <p>The creator tool uses TikTok Login Kit to connect an account chosen by the creator. It requests only <code>user.info.basic</code>, which identifies and displays the authorized account, and <code>video.upload</code>, which allows a creator-confirmed video to be transferred as a draft.</p>
+          <p>Before a transfer, the tool shows the authorized account and a preview of the selected video and requires explicit consent. The backend then sends the file to that account as a draft and checks the processing status. Além do Hit does not request <code>video.publish</code>, does not Direct Post, and does not automatically publish content.</p>
+          <p>The creator completes the caption, privacy, comments, and any other settings made available by TikTok inside TikTok's own inbox or editor, where the creator makes the final publication decision.</p>
+          <p>TikTok client credentials and OAuth tokens are never placed in the public frontend. Access and refresh tokens are encrypted at rest on the backend.</p>
 
-          <h2 id="sharing">5. When information may be shared</h2>
+          <h2 id="cookies">5. Essential cookie</h2>
+          <p>The creator tool uses one strictly necessary, opaque session cookie to maintain the authorization session, protect state-changing requests, and associate the creator with the encrypted TikTok connection and upload status held on the backend. It is not used for advertising, behavioral analytics, or cross-site tracking.</p>
+          <p>The cookie is configured with appropriate security attributes in production, including HTTPS-only transport. Blocking or deleting it may end the active session or prevent the creator workflow from functioning.</p>
+
+          <h2 id="sharing">6. When information may be shared</h2>
           <p>Information may be shared only when reasonably necessary with:</p>
           <ul>
-            <li><strong>Connected platforms.</strong> TikTok or another creator-selected destination receives content, metadata, settings, and authorization details needed for a requested operation.</li>
-            <li><strong>Necessary providers.</strong> Limited information may be handled by providers supplying hosting, media transfer, storage, security, or diagnostic infrastructure.</li>
+            <li><strong>TikTok.</strong> TikTok receives the creator-confirmed video, authorization information, and transfer details required to create the draft and report its status.</li>
+            <li><strong>Necessary providers.</strong> Limited information may be handled by providers supplying HTTPS hosting, temporary media transfer, storage, security, or diagnostic infrastructure.</li>
             <li><strong>Legal and safety recipients.</strong> Information may be preserved or disclosed when required by applicable law, valid legal process, security needs, or the protection of rights and safety.</li>
           </ul>
           <p><strong>Além do Hit does not sell personal information or TikTok user data and does not share it for behavioral advertising.</strong></p>
 
-          <h2 id="retention">6. Retention</h2>
-          <p>Information is kept only for as long as reasonably necessary for the purpose for which it was collected, such as maintaining an authorized connection, completing a creator-requested transfer, checking status, securing the operation, responding to support, or meeting a legal obligation.</p>
-          <p>Authorization information is removed or invalidated when it is no longer needed, access is revoked, or a verified deletion request is completed, subject to limited records that may be retained for security or legal reasons. Temporary media used for a transfer is scheduled for deletion or allowed to expire after the operational period reasonably needed to complete or troubleshoot it.</p>
+          <h2 id="retention">7. Retention</h2>
+          <p>Information is kept only for as long as reasonably necessary to maintain the creator's authorized connection, complete a confirmed draft transfer, check status, secure the operation, respond to support, or meet a legal obligation.</p>
+          <p>The selected video is stored only in a temporary upload location and is normally deleted immediately after the transfer attempt completes or fails. If a process interruption leaves a temporary file behind, startup and scheduled cleanup remove recognized upload files after they are more than six hours old. Videos are not kept as a media library.</p>
+          <p>Essential sessions are configured for no more than 30 days and use a seven-day default. Expired sessions and their associated records are deleted when cleanup runs. Disconnecting removes the encrypted authorization credentials and upload-status records while leaving an anonymous essential session; <strong>Delete my data</strong> removes the session and other associated application records. A verified deletion request provides another route, subject only to limited records that may need to be retained for security or legal reasons.</p>
 
-          <h2 id="security">7. Security</h2>
-          <p>Reasonable technical and organizational measures are used to reduce the risk of unauthorized access, alteration, disclosure, or loss. Access to operational data should be limited, and confidential platform credentials must remain outside the public website and public source code.</p>
+          <h2 id="security">8. Security</h2>
+          <p>Reasonable technical and organizational measures are used to reduce the risk of unauthorized access, alteration, disclosure, or loss. These measures include HTTPS in production, OAuth state validation, an essential opaque session cookie, anti-forgery protection for state-changing actions, encrypted token storage, file-type and size validation, temporary upload deletion, and restricted access to operational data.</p>
           <p>No method of transmission or storage is completely secure. If you believe an authorized connection may be at risk, remove the connection through the platform and contact support.</p>
 
-          <h2 id="website">8. Public website</h2>
-          <p>This website is a static GitHub Pages site. It does not create user accounts, accept file uploads, store TikTok credentials, or publish content. It does not intentionally use advertising cookies or advertising trackers.</p>
-          <p>GitHub may process standard hosting information, such as IP address, browser or device information, and request timestamps, under its own policies. Your email provider processes any message you choose to send through an email link.</p>
+          <h2 id="website">9. Public pages and creator tool</h2>
+          <p>The public informational pages are served as static files and do not themselves store TikTok credentials. The creator-tool interface communicates with a separate secure backend over HTTPS for TikTok authorization, protected session handling, temporary video transfer, upload status, disconnection, and data deletion.</p>
+          <p>Hosting providers may process standard request information, such as IP address, browser or device information, and request timestamps, under their own policies. Your email provider processes any message you choose to send through an email link. Além do Hit does not intentionally use advertising cookies or advertising trackers.</p>
 
-          <h2 id="choices">9. Revocation, deletion, and other choices</h2>
-          <p>You may decline to connect an account or remove an existing TikTok connection through TikTok's connected-app settings. Revoking access stops future authorized requests, but it may not automatically delete information already controlled by the operator or remove content already published on TikTok.</p>
+          <h2 id="choices">10. Revocation, deletion, and other choices</h2>
+          <p>You may decline authorization, use <strong>Disconnect TikTok</strong> in the creator tool, or remove the connection through TikTok's connected-app settings. Disconnecting through the tool ends the application connection and deletes the stored authorization credentials associated with the session. Removing access in TikTok prevents future authorized requests but may not automatically delete other information already controlled by the operator.</p>
           <p>To request access, correction, or deletion of operator-controlled personal information, email <a href="mailto:alelseixas@gmail.com">alelseixas@gmail.com</a>. Do not send passwords or tokens. Reasonable verification may be requested to protect the account and data involved.</p>
           <p>See <a href="data-deletion.html">Revocation &amp; Data Deletion</a> for step-by-step instructions. Limited information may be retained when necessary for security, fraud prevention, legal compliance, or documenting completion of a request.</p>
 
-          <h2 id="children">10. Children's privacy</h2>
+          <h2 id="children">11. Children's privacy</h2>
           <p>Além do Hit is not directed to children and is not intended to knowingly collect children's personal information in violation of applicable law. Contact the operator if you believe such information has been provided.</p>
 
-          <h2 id="changes">11. Changes to this Policy</h2>
+          <h2 id="changes">12. Changes to this Policy</h2>
           <p>This Policy may be updated as the project, integrations, or applicable requirements change. The current version and update date will remain available at this URL.</p>
 
-          <h2 id="contact">12. Contact</h2>
+          <h2 id="contact">13. Contact</h2>
           <p>For privacy questions, security concerns, revocation help, or data deletion, contact Além do Hit at <a href="mailto:alelseixas@gmail.com">alelseixas@gmail.com</a>.</p>
           <div class="inline-links"><a href="terms.html">Terms of Service</a><a href="data-deletion.html">Data Deletion</a><a href="support.html">Support</a></div>
         </article>
@@ -125,8 +133,8 @@
 
   <footer class="site-footer">
     <div class="wrap footer-main">
-      <div class="footer-brand"><a class="brand" href="index.html" aria-label="Além do Hit home"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-copy"><strong>Além do Hit</strong><small>Music stories with context</small></span></a><p>An independent music editorial project. Music Short Factory is its internal production workflow.</p></div>
-      <div class="footer-column"><strong>Explore</strong><a href="index.html">Home</a><a href="about.html">About &amp; How It Works</a><a href="support.html">Support</a></div>
+      <div class="footer-brand"><a class="brand" href="index.html" aria-label="Além do Hit home"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-copy"><strong>Além do Hit</strong><small>Music stories with context</small></span></a><p>A creator tool for short-form music stories. Music Short Factory is its preparation, review, and draft-delivery workflow.</p></div>
+      <div class="footer-column"><strong>Explore</strong><a href="index.html">Home</a><a href="about.html">About &amp; How It Works</a><a href="app.html">Creator tool</a><a href="support.html">Support</a></div>
       <div class="footer-column"><strong>Privacy</strong><a href="privacy.html" aria-current="page">Privacy Policy</a><a href="data-deletion.html">Data Deletion</a><a href="mailto:alelseixas@gmail.com">Contact</a></div>
       <div class="footer-column"><strong>Legal</strong><a href="terms.html">Terms of Service</a><a href="privacy.html" aria-current="page">Privacy Policy</a></div>
     </div>

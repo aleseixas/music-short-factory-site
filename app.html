@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Creator App | Além do Hit</title>
+  <meta name="description" content="Connect your TikTok account, preview your video, and send it to your own TikTok drafts with the Music Short Factory creator workflow.">
+  <meta name="theme-color" content="#090b0b">
+  <link rel="canonical" href="https://aleseixas.github.io/music-short-factory-site/app.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Além do Hit">
+  <meta property="og:title" content="Creator App | Além do Hit">
+  <meta property="og:description" content="Preview a video and send it to your own authorized TikTok drafts.">
+  <meta property="og:url" content="https://aleseixas.github.io/music-short-factory-site/app.html">
+  <meta property="og:image" content="https://aleseixas.github.io/music-short-factory-site/assets/alem-do-hit-og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Além do Hit — music stories with context">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+  <script src="app.js" type="module"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html" aria-label="Além do Hit home"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-copy"><strong>Além do Hit</strong><small>Music Short Factory</small></span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Toggle navigation"><span></span></button>
+      <nav class="site-nav" id="primary-navigation" aria-label="Primary" data-open="false"><a href="index.html">Home</a><a href="about.html">About &amp; How It Works</a><a href="app.html" aria-current="page">Creator App</a><a class="nav-contact" href="support.html">Support</a></nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="page-hero app-hero" aria-labelledby="app-title">
+      <div class="wrap page-hero-inner">
+        <p class="eyebrow">Music Short Factory</p>
+        <h1 id="app-title">Send your video to your own TikTok drafts.</h1>
+        <p class="lead">Connect an account you control, preview a local video, confirm the transfer, and finish the caption and publishing choices inside TikTok.</p>
+        <nav class="page-meta" aria-label="Creator app information"><a href="about.html#workflow">How it works</a><a href="privacy.html">Privacy Policy</a><a href="data-deletion.html">Disconnect &amp; delete data</a></nav>
+      </div>
+    </section>
+
+    <section class="section section-tinted app-section" aria-labelledby="workspace-title">
+      <div class="wrap">
+        <noscript><div class="app-alert app-alert-error">JavaScript is required for the creator workflow. It is used for the local video preview, upload progress, and status updates.</div></noscript>
+        <div class="app-alert" id="runtime-alert" role="status" hidden></div>
+
+        <div class="app-layout">
+          <aside class="app-progress" aria-label="Draft upload steps">
+            <p class="eyebrow">Draft workflow</p>
+            <ol>
+              <li data-progress-step="connect"><span>01</span><div><strong>Connect</strong><small>Authorize your TikTok account</small></div></li>
+              <li data-progress-step="preview"><span>02</span><div><strong>Preview</strong><small>Choose and review your video</small></div></li>
+              <li data-progress-step="confirm"><span>03</span><div><strong>Confirm</strong><small>Approve the draft transfer</small></div></li>
+              <li data-progress-step="complete"><span>04</span><div><strong>Continue in TikTok</strong><small>Edit settings and publish</small></div></li>
+            </ol>
+          </aside>
+
+          <div class="creator-workspace">
+            <div class="workspace-heading">
+              <div><p class="eyebrow">Creator workspace</p><h2 id="workspace-title">One real transfer, under your control.</h2></div>
+              <span class="environment-badge" id="environment-badge">Checking connection</span>
+            </div>
+
+            <section class="app-panel" aria-labelledby="connect-title">
+              <div class="app-panel-heading"><span class="panel-number">01</span><div><h3 id="connect-title">Connect your TikTok account</h3><p>TikTok handles sign-in and shows the permissions requested before you authorize access.</p></div></div>
+
+              <div id="disconnected-view">
+                <div class="app-panel-action">
+                  <p>Only the account that completes TikTok authorization can receive the draft.</p>
+                  <a class="button button-primary" id="connect-link" href="/auth/tiktok">Connect with TikTok <span aria-hidden="true">→</span></a>
+                </div>
+              </div>
+
+              <div id="connected-view" hidden>
+                <div class="account-card">
+                  <div class="account-avatar" id="account-avatar-fallback" aria-hidden="true">T</div>
+                  <img class="account-avatar" id="account-avatar" alt="" hidden>
+                  <div class="account-details"><span>Authorized TikTok account</span><strong id="account-name">Connected account</strong><small id="account-scopes"></small></div>
+                  <div class="account-actions"><button class="text-button" id="disconnect-button" type="button">Disconnect TikTok</button><button class="text-button text-button-danger" id="delete-button" type="button">Delete my data</button></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="app-panel" aria-labelledby="video-title">
+              <div class="app-panel-heading"><span class="panel-number">02</span><div><h3 id="video-title">Choose and preview your video</h3><p>The preview stays in your browser. The backend receives the file only after your explicit confirmation.</p></div></div>
+
+              <label class="file-picker" for="video-file" id="file-picker">
+                <input id="video-file" name="video" type="file" accept="video/mp4,video/quicktime,video/webm" disabled>
+                <span class="file-picker-icon" aria-hidden="true">+</span>
+                <strong>Select an MP4, MOV, or WebM</strong>
+                <small id="file-limit">Connect TikTok before selecting a file.</small>
+              </label>
+
+              <div class="video-preview" id="video-preview-wrap" hidden>
+                <video id="video-preview" controls playsinline preload="metadata"></video>
+                <div class="video-meta"><div><span>File</span><strong id="video-name"></strong></div><div><span>Size</span><strong id="video-size"></strong></div><div><span>Duration</span><strong id="video-duration">Reading…</strong></div></div>
+              </div>
+            </section>
+
+            <section class="app-panel" aria-labelledby="confirm-title">
+              <div class="app-panel-heading"><span class="panel-number">03</span><div><h3 id="confirm-title">Confirm the draft transfer</h3><p>This action uploads the selected video to the authorized account's TikTok inbox. It does not publish automatically.</p></div></div>
+
+              <div class="draft-explainer">
+                <strong>What happens next</strong>
+                <p>TikTok will notify you when the draft is ready. Open that notification to edit the caption, choose privacy and interaction settings, and decide whether to publish.</p>
+              </div>
+
+              <label class="consent-check" for="upload-consent"><input id="upload-consent" type="checkbox" disabled><span>I reviewed this video and explicitly want to send it to my authorized TikTok account as a draft.</span></label>
+
+              <div class="upload-actions"><button class="button button-primary" id="upload-button" type="button" disabled>Send to TikTok drafts <span aria-hidden="true">→</span></button><span class="upload-helper">Nothing is sent until you press this button.</span></div>
+
+              <div class="upload-progress" id="upload-progress-wrap" hidden>
+                <div><strong id="upload-progress-label">Uploading video</strong><span id="upload-progress-value">0%</span></div>
+                <progress id="upload-progress" max="100" value="0">0%</progress>
+              </div>
+            </section>
+
+            <section class="app-panel" id="status-panel" aria-labelledby="status-title" hidden>
+              <div class="app-panel-heading"><span class="panel-number">04</span><div><h3 id="status-title">TikTok transfer status</h3><p id="status-description" aria-live="polite">Waiting for an update.</p></div></div>
+              <div class="status-card"><span class="status-dot" id="status-dot" aria-hidden="true"></span><div><span>Current status</span><strong id="status-value">—</strong><small id="publish-id"></small></div><button class="text-button" id="refresh-status-button" type="button">Refresh status</button></div>
+              <div class="next-step" id="next-step" hidden><strong>Continue in the TikTok app</strong><p>Open the notification in your TikTok inbox. Review the draft, choose the settings TikTok makes available to your account, and publish only if you are ready.</p></div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="boundary-title">
+      <div class="wrap split">
+        <div><p class="eyebrow">Clear boundaries</p><h2 id="boundary-title">Draft upload is not Direct Post.</h2></div>
+        <div><p class="section-intro">Music Short Factory transfers the file you confirm. TikTok's own editing flow remains the place where you set the caption, privacy, comments, Duet, Stitch, and the final publishing decision.</p><div class="inline-links"><a href="privacy.html">How data is handled</a><a href="support.html">Get support</a></div></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-main">
+      <div class="footer-brand"><a class="brand" href="index.html" aria-label="Além do Hit home"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-copy"><strong>Além do Hit</strong><small>Music Short Factory</small></span></a><p>A creator workflow for research-led, short-form music stories.</p></div>
+      <div class="footer-column"><strong>Explore</strong><a href="index.html">Home</a><a href="about.html">About &amp; How It Works</a><a href="app.html" aria-current="page">Creator App</a><a href="support.html">Support</a></div>
+      <div class="footer-column"><strong>Privacy</strong><a href="privacy.html">Privacy Policy</a><a href="data-deletion.html">Data Deletion</a><a href="mailto:alelseixas@gmail.com">Contact</a></div>
+      <div class="footer-column"><strong>Legal</strong><a href="terms.html">Terms of Service</a><a href="privacy.html">Privacy Policy</a></div>
+    </div>
+    <div class="wrap footer-bottom"><p>© <span data-year>2026</span> Além do Hit.</p><p>Independent from TikTok and other social platforms.</p></div>
+  </footer>
+</body>
+</html>

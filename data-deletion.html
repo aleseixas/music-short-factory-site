@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Revocation &amp; Data Deletion | Além do Hit</title>
-  <meta name="description" content="How to remove TikTok access and request deletion of data controlled by the Além do Hit operator.">
+  <meta name="description" content="How to disconnect TikTok, revoke access, and delete data held by the Além do Hit creator tool.">
   <meta name="theme-color" content="#090b0b">
   <link rel="canonical" href="https://aleseixas.github.io/music-short-factory-site/data-deletion.html">
   <meta property="og:type" content="website">
@@ -26,7 +26,7 @@
     <div class="wrap header-inner">
       <a class="brand" href="index.html" aria-label="Além do Hit home"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-copy"><strong>Além do Hit</strong><small>Music stories with context</small></span></a>
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Toggle navigation"><span></span></button>
-      <nav class="site-nav" id="primary-navigation" aria-label="Primary" data-open="false"><a href="index.html">Home</a><a href="about.html">About &amp; How It Works</a><a class="nav-contact" href="support.html">Support</a></nav>
+      <nav class="site-nav" id="primary-navigation" aria-label="Primary" data-open="false"><a href="index.html">Home</a><a href="about.html">About &amp; How It Works</a><a href="support.html">Support</a><a class="nav-contact" href="app.html">Open creator tool</a></nav>
     </div>
   </header>
 
@@ -35,15 +35,22 @@
       <div class="wrap page-hero-inner">
         <p class="eyebrow">Privacy choices</p>
         <h1 id="deletion-title">Revocation &amp; Data Deletion</h1>
-        <p class="lead">Removing TikTok access and deleting data held by the Além do Hit operator are separate actions. You may choose either one or both.</p>
+        <p class="lead">Disconnecting the creator tool, removing access in TikTok, and deleting data held by Além do Hit are related but distinct actions. You can complete any or all of them.</p>
         <nav class="page-meta" aria-label="Page actions"><a href="#revoke">Remove TikTok access</a><a href="#request">Request data deletion</a><a href="privacy.html">Privacy Policy</a></nav>
       </div>
     </section>
 
     <section class="section section-tinted" id="revoke" aria-labelledby="revoke-title">
       <div class="wrap split">
-        <div><p class="eyebrow">Action 1</p><h2 id="revoke-title">Remove the application's TikTok access.</h2><p class="section-intro">Revocation prevents future requests using that authorization. It does not automatically remove an existing TikTok post or delete information already controlled by the operator.</p></div>
+        <div><p class="eyebrow">Action 1</p><h2 id="revoke-title">Disconnect or revoke TikTok access.</h2><p class="section-intro">Revocation prevents future requests using that authorization. It does not remove a draft or post already held by TikTok, and revocation inside TikTok may not by itself erase other information controlled by the operator.</p></div>
         <div class="instruction-card">
+          <h3>From the creator tool</h3>
+          <ol class="numbered-list">
+            <li><span>1</span><p>Open the <a href="app.html">Além do Hit creator tool</a> in the browser used for your session.</p></li>
+            <li><span>2</span><p>Select <strong>Disconnect TikTok</strong> and confirm.</p></li>
+            <li><span>3</span><p>The backend ends the connection and deletes the OAuth credentials stored for that session.</p></li>
+          </ol>
+          <h3>From TikTok</h3>
           <ol class="numbered-list">
             <li><span>1</span><p>Open TikTok and tap <strong>Profile</strong>.</p></li>
             <li><span>2</span><p>Tap the <strong>Menu</strong> button, then <strong>Settings and privacy</strong>.</p></li>
@@ -60,17 +67,20 @@
       <div class="wrap">
         <div class="section-heading"><div><p class="eyebrow">What revocation changes</p><h2 id="effects-title">Know what remains under each party's control.</h2></div></div>
         <div class="card-grid three">
-          <article class="card"><span class="card-index">01</span><h3>Future access</h3><p>Removing access prevents the integration from making future authorized requests for that TikTok account.</p></article>
-          <article class="card"><span class="card-index">02</span><h3>Operator-held data</h3><p>Revocation may not erase records already controlled by the operator. Use the separate request below for deletion.</p></article>
-          <article class="card"><span class="card-index">03</span><h3>TikTok-hosted posts</h3><p>Manage or delete content already published on TikTok through your own TikTok account controls.</p></article>
+          <article class="card"><span class="card-index">01</span><h3>Future access</h3><p>Disconnecting or removing access prevents future authorized draft-upload requests for that TikTok account.</p></article>
+          <article class="card"><span class="card-index">02</span><h3>Operator-held data</h3><p>The creator-tool disconnect deletes stored OAuth credentials. Use the separate deletion action below for other data associated with the session.</p></article>
+          <article class="card"><span class="card-index">03</span><h3>TikTok-hosted drafts</h3><p>Manage or delete a transferred draft or published post through your own TikTok account controls.</p></article>
         </div>
       </div>
     </section>
 
     <section class="section section-tinted" id="request" aria-labelledby="request-title">
       <div class="wrap split">
-        <div><p class="eyebrow">Action 2</p><h2 id="request-title">Request deletion of operator-controlled data.</h2><p class="section-intro">Send enough non-sensitive information to identify the relevant records. Reasonable verification may be requested to protect your data.</p></div>
+        <div><p class="eyebrow">Action 2</p><h2 id="request-title">Delete operator-controlled data.</h2><p class="section-intro">If your creator-tool session is active, use <strong>Delete my data</strong> for the most direct route. You can also submit an email request. Reasonable verification may be required to protect your data.</p></div>
         <div class="contact-card">
+          <span class="contact-label">In the creator tool</span>
+          <p>Open the <a href="app.html">creator tool</a>, select <strong>Delete my data</strong>, and confirm. The backend deletes the session's stored TikTok connection, account data, upload status, and related operator-controlled records. The essential session cookie is then cleared.</p>
+          <a class="button" href="app.html">Open creator tool</a>
           <span class="contact-label">Data deletion email</span>
           <a class="email-link" href="mailto:alelseixas@gmail.com?subject=Além%20do%20Hit%20Data%20Deletion%20Request">alelseixas@gmail.com</a>
           <p>Use the subject <strong>Além do Hit Data Deletion Request</strong> and include:</p>
@@ -89,7 +99,7 @@
     <section class="section" aria-labelledby="scope-title">
       <div class="wrap narrow-section">
         <p class="eyebrow">Request scope</p><h2 id="scope-title">What may be reviewed for deletion.</h2>
-        <p class="section-intro">A verified request may cover TikTok account identifiers, basic authorized profile information, OAuth authorization credentials, videos and publishing metadata, settings, status information, and technical logs controlled by the operator.</p>
+        <p class="section-intro">A deletion action or verified request may cover the essential session record, TikTok account identifiers, basic authorized profile information, encrypted OAuth authorization credentials, upload status information, and related technical records controlled by the operator. Selected videos are normally deleted immediately after the transfer attempt; interrupted-process remnants are removed by cleanup after they are more than six hours old.</p>
         <div class="notice"><strong>Important distinction.</strong> Além do Hit can act only on data under the operator's control. TikTok controls information and content hosted on TikTok. Limited records may be retained where reasonably necessary for security, fraud prevention, legal compliance, or documenting completion of the request.</div>
         <div class="inline-links"><a href="privacy.html">Privacy Policy</a><a href="support.html">Contact Support</a></div>
       </div>
@@ -98,8 +108,8 @@
 
   <footer class="site-footer">
     <div class="wrap footer-main">
-      <div class="footer-brand"><a class="brand" href="index.html" aria-label="Além do Hit home"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-copy"><strong>Além do Hit</strong><small>Music stories with context</small></span></a><p>An independent music editorial project. Music Short Factory is its internal production workflow.</p></div>
-      <div class="footer-column"><strong>Explore</strong><a href="index.html">Home</a><a href="about.html">About &amp; How It Works</a><a href="support.html">Support</a></div>
+      <div class="footer-brand"><a class="brand" href="index.html" aria-label="Além do Hit home"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-copy"><strong>Além do Hit</strong><small>Music stories with context</small></span></a><p>A creator tool for short-form music stories. Music Short Factory is its preparation, review, and draft-delivery workflow.</p></div>
+      <div class="footer-column"><strong>Explore</strong><a href="index.html">Home</a><a href="about.html">About &amp; How It Works</a><a href="app.html">Creator tool</a><a href="support.html">Support</a></div>
       <div class="footer-column"><strong>Privacy</strong><a href="privacy.html">Privacy Policy</a><a href="data-deletion.html" aria-current="page">Data Deletion</a><a href="mailto:alelseixas@gmail.com">Contact</a></div>
       <div class="footer-column"><strong>Legal</strong><a href="terms.html">Terms of Service</a><a href="privacy.html">Privacy Policy</a></div>
     </div>

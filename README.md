@@ -1,128 +1,273 @@
-# Além do Hit — official website
+# Além do Hit — Music Short Factory creator workflow
 
-Simple, static, multi-page website for **Além do Hit**, an independent music editorial project focused on short-form educational and documentary stories.
+Além do Hit is a focused web tool for creators producing short-form educational and documentary music stories. **Music Short Factory** names the broader editorial workflow. The current web application accepts a creator-finished video, connects a creator-owned TikTok account, previews the selected file locally, requires explicit confirmation, and sends the video to that account as a draft. It does not create or edit video in the browser.
 
-**Music Short Factory** appears only as the name of the internal desktop workflow used to organize research, scripts, assets, video production, review, metadata, and publishing preparation. It is not presented as a large public SaaS product.
+The implementation is intentionally small. It exists to demonstrate a truthful, end-to-end TikTok Sandbox flow without payments, plans, teams, analytics, an administrative dashboard, or unrelated product features.
 
-The site is written in English for an international audience and can be used as the public Website URL during TikTok for Developers App Review. It does not claim TikTok approval, public product availability, customers, metrics, partnerships, or features that do not exist.
+## Chosen TikTok flow
 
-## Public URL
+This project uses the TikTok **Upload API** instead of Direct Post.
+
+- Product access: Login Kit and Content Posting API.
+- Scopes: `user.info.basic` and `video.upload` only.
+- Result: a creator-confirmed video is delivered to the authorized account as a draft.
+- Final step: the creator opens TikTok's inbox or editor, reviews or adds the caption, chooses the privacy and interaction settings TikTok makes available, and decides whether to publish.
+- Not used: `video.publish`, Direct Post, or `creator_info`.
+
+This is the smallest useful review flow because Além do Hit does not need to reproduce TikTok's publishing settings. Those choices remain in TikTok's own interface.
+
+Official references checked on August 29, 2026:
+
+- [TikTok App Review Guidelines](https://developers.tiktok.com/docs/en/app-review-guidelines)
+- [Login Kit for Web](https://developers.tiktok.com/doc/login-kit-web)
+- [Get Started — Upload](https://developers.tiktok.com/docs/en/content-posting-api-get-started-upload-content)
+- [Upload API reference](https://developers.tiktok.com/docs/en/content-posting-api-reference-upload-video)
+- [Get Post Status](https://developers.tiktok.com/docs/en/content-posting-api-reference-get-video-status)
+- [Development configuration, trusted domains, and URL verification](https://developers.tiktok.com/docs/en/set-up-development-configuration)
+- [Sandbox setup](https://developers.tiktok.com/doc/add-a-sandbox/)
+
+## Architecture
+
+```text
+Creator browser
+  ├─ public pages and app.html
+  ├─ local video preview
+  └─ explicit upload confirmation
+          │ HTTPS, same origin
+          ▼
+Minimal Node/Express backend
+  ├─ opaque essential session cookie + CSRF protection
+  ├─ OAuth state and callback validation
+  ├─ encrypted TikTok tokens in SQLite
+  ├─ temporary video validation and transfer
+  └─ TikTok draft-upload status
+          │
+          ▼
+TikTok Login Kit + Content Posting API
+  └─ creator finishes the draft in TikTok
+```
+
+The backend must serve the frontend and API from the same HTTPS origin in the functional review deployment. GitHub Pages can continue to host the public marketing and legal mirror, but it cannot execute OAuth, protect client credentials, or receive video uploads. When `app.html` is opened on GitHub Pages, it reports that the secure backend is unavailable instead of simulating a working connection.
+
+## Files and public pages
+
+| Path | Purpose |
+| --- | --- |
+| `index.html` | Public product overview and direct links to Terms and Privacy |
+| `about.html` | Audience, Music Short Factory workflow, creator control, and Upload API boundary |
+| `app.html` / `app.js` | Real creator UI for connection, local preview, confirmation, transfer, status, disconnection, and session-data deletion |
+| `support.html` | Support contact, troubleshooting, and FAQ |
+| `privacy.html` | Privacy Policy at the existing public path |
+| `terms.html` | Terms of Service at the existing public path |
+| `data-deletion.html` | TikTok revocation and operator-controlled deletion instructions |
+| `404.html` | Static-host fallback |
+| `styles.css` / `script.js` | Shared responsive styles and accessible navigation |
+| `server/` | Minimum OAuth, token storage, upload, status, disconnect, and deletion backend |
+| `verification/` | Optional TikTok URL-prefix signature file, served at the public site root |
+| `.env.example` | Configuration names and safe placeholders; never production values |
+| `Dockerfile` | Reproducible Node production container |
+| `sitemap.xml`, `robots.txt`, `.nojekyll` | Public discovery and GitHub Pages compatibility |
+
+## Backend routes
+
+| Route | Purpose |
+| --- | --- |
+| `GET /api/session` | Creates or reads the essential session and returns safe connection state, CSRF token, limits, and latest upload status |
+| `GET /auth/tiktok` | Starts TikTok Login Kit authorization with the fixed required scopes |
+| `GET /auth/tiktok/callback` | Validates OAuth state, exchanges the code on the server, and stores encrypted tokens |
+| `POST /api/upload` | Accepts multipart field `video` plus `consentConfirmed=true`; requires `X-CSRF-Token` and starts one draft transfer |
+| `GET /api/publish/status?publishId=...` | Checks the status of the session's specified TikTok draft transfer |
+| `POST /api/disconnect` | Requires CSRF protection, revokes TikTok access, and deletes the stored connection |
+| `POST /api/delete-data` | Requires CSRF protection and deletes operator-controlled data for the browser session |
+| `GET /api/health` | Minimal health check for deployment monitoring |
+
+## Local setup
+
+Requirements:
+
+- Node.js 22.13 or newer;
+- a TikTok for Developers app with Login Kit and Content Posting API enabled for Sandbox testing;
+- TikTok Sandbox test users added in the Developer Portal.
+
+Install dependencies and create a local environment file:
+
+```bash
+npm ci
+cp .env.example .env
+```
+
+Generate a unique 32-byte token-encryption key:
+
+```bash
+node -e "console.log(require('node:crypto').randomBytes(32).toString('base64'))"
+```
+
+Put the generated value and the Sandbox credentials in `.env`, then run:
+
+```bash
+npm start
+```
+
+The pages and non-OAuth API checks can run locally at `http://localhost:3000/`. TikTok OAuth requires an externally reachable HTTPS origin, including during Sandbox testing. Use a trusted HTTPS development tunnel or the production-like HTTPS host, set `PUBLIC_ORIGIN` to that origin, set `TIKTOK_REDIRECT_URI` to the same origin plus `/auth/tiktok/callback`, register that exact Redirect URI in the Developer Portal, and open `/app.html` through the HTTPS origin.
+
+Run the automated checks with:
+
+```bash
+npm test
+```
+
+## Environment variables
+
+| Variable | Purpose |
+| --- | --- |
+| `NODE_ENV` | Use `production` in the HTTPS deployment |
+| `PORT` | HTTP port used by the Node process |
+| `PUBLIC_ORIGIN` | Exact externally accessible origin, with no path; HTTPS is required in production |
+| `TIKTOK_CLIENT_KEY` | TikTok app Client Key; server-side configuration |
+| `TIKTOK_CLIENT_SECRET` | TikTok app Client Secret; server secret, never expose or commit it |
+| `TIKTOK_REDIRECT_URI` | Must equal `${PUBLIC_ORIGIN}/auth/tiktok/callback` exactly |
+| `TOKEN_ENCRYPTION_KEY` | Unique 32-byte key used for AES-256-GCM encryption of OAuth tokens |
+| `SESSION_COOKIE_NAME` | Opaque essential-session cookie name; use a secure `__Host-` name in production |
+| `SESSION_TTL_SECONDS` | Session lifetime |
+| `OAUTH_STATE_TTL_SECONDS` | Short OAuth state lifetime |
+| `DATABASE_PATH` | Persistent SQLite database path |
+| `UPLOAD_DIR` | Private temporary upload directory |
+| `MAX_UPLOAD_BYTES` | Deployment upload limit, within TikTok's applicable limit |
+| `TRUST_PROXY` | Enable only when the production service is behind a trusted HTTPS proxy |
+
+Never place `.env`, SQLite files, uploaded videos, client secrets, access tokens, or refresh tokens in Git or a public frontend.
+
+## Production deployment
+
+The functional creator app cannot run on GitHub Pages alone. Deploy the Node service to an HTTPS host that supports:
+
+- a persistent writable volume for `DATABASE_PATH`;
+- a private writable temporary directory for `UPLOAD_DIR`;
+- request bodies large enough for the configured `MAX_UPLOAD_BYTES`;
+- long enough request timeouts for server-mediated video transfer;
+- secret environment variables; and
+- a stable public origin and callback URL.
+
+Recommended sequence:
+
+1. Provision the HTTPS service and persistent volume.
+2. Set every production environment variable in the hosting provider, not in source control.
+3. Set `NODE_ENV=production` and make `PUBLIC_ORIGIN` the exact HTTPS origin.
+4. Set `TIKTOK_REDIRECT_URI` to the exact same origin plus `/auth/tiktok/callback`.
+5. Deploy and verify `GET /api/health`.
+6. Open `/app.html`, complete the Sandbox authorization, and perform one test draft transfer.
+7. Verify the temporary upload directory no longer contains the transferred file.
+
+The static GitHub Pages site remains available at:
 
 <https://aleseixas.github.io/music-short-factory-site/>
 
-The site uses plain HTML, CSS, and a small JavaScript file. It has no framework, package installation, build step, backend, database, authentication, account dashboard, analytics, or API calls.
+For App Review, use the functional HTTPS deployment as the Website URL so the Home, creator tool, support, and legal pages are available on one working product origin. The backend rewrites canonical and Open Graph URLs to the active production host when it serves the pages. The existing GitHub Pages legal URLs may remain public during that transition.
 
-## Site structure
+## TikTok Developer Portal alignment
 
-| File | Public page | Purpose |
-| --- | --- | --- |
-| `index.html` | `/` | Brand overview, audience, workflow summary, creator control, short TikTok note, privacy, FAQ, and direct legal links |
-| `about.html` | `/about.html` | About and complete Research → Story → Video → Review → Publish workflow |
-| `support.html` | `/support.html` | Contact, support topics, and FAQ |
-| `privacy.html` | `/privacy.html` | Privacy Policy |
-| `terms.html` | `/terms.html` | Terms of Service |
-| `data-deletion.html` | `/data-deletion.html` | TikTok authorization revocation and operator-controlled data deletion instructions |
-| `404.html` | GitHub Pages fallback | Helpful not-found page |
-| `styles.css` | Shared asset | Responsive visual system and print styles |
-| `script.js` | Shared asset | Accessible mobile navigation and current footer year |
-| `assets/alem-do-hit-og.png` | Social asset | Open Graph preview image |
-| `sitemap.xml` | Discovery | Public page inventory |
-| `robots.txt` | Discovery | Crawler policy and sitemap location |
-| `.nojekyll` | GitHub Pages | Keeps deployment on the plain static-file path |
+Use one consistent public identity throughout the portal and demonstration:
 
-The former separate `how-it-works.html` content was consolidated into `about.html`. The former `tiktok-integration.html` page was removed; a short, transparent integration section now appears on the Home and About pages.
+- **App Name:** `Além do Hit`
+- **Workflow name shown in the product:** `Music Short Factory`
+- **Website URL:** the functional production HTTPS origin
+- **Privacy Policy URL:** `${PUBLIC_ORIGIN}/privacy.html`
+- **Terms of Service URL:** `${PUBLIC_ORIGIN}/terms.html`
+- **Redirect URI:** `${PUBLIC_ORIGIN}/auth/tiktok/callback`
+- **Products:** Login Kit and Content Posting API
+- **Scopes:** `user.info.basic`, `video.upload`
 
-## Test locally
+Do not request `video.publish` for this Upload API submission. Do not add `creator_info` settings to the creator UI. The authorization screen, portal configuration, public copy, Privacy Policy, Terms, and recorded demonstration should show the same app name, URLs, scopes, and draft-only behavior.
 
-No dependencies are required. From the repository root:
+In the Development configuration, also add the exact production HTTPS origin as a trusted domain and verify the configured URL properties. DNS verification is the simplest option when you control the domain. If TikTok provides a URL-prefix signature file instead, place the unchanged `.txt` or `.html` file in `verification/`, redeploy, and confirm it is available at `https://your-public-origin.example/<signature-filename>` with HTTP 200 and no redirect before completing verification.
 
-```bash
-python -m http.server 8000
-```
+## Sandbox end-to-end check
 
-Then open:
+Before recording the review video:
 
-```text
-http://localhost:8000/
-```
+1. Add the TikTok account used in the demonstration as an authorized Sandbox user.
+2. Confirm the production Redirect URI exactly matches the portal entry.
+3. Open the functional HTTPS `/app.html` in a clean browser session.
+4. Connect TikTok and confirm the authorization screen requests only `user.info.basic` and `video.upload`.
+5. Verify the returned display name or avatar belongs to the account just authorized.
+6. Select a small, rights-cleared test video and play the local preview.
+7. Confirm the upload button remains disabled until the explicit consent checkbox is selected.
+8. Confirm the transfer and wait for the app to report delivery to the TikTok inbox.
+9. Open TikTok, locate the draft or notification, choose the settings TikTok makes available, and complete or stop the publication deliberately.
+10. Return to the tool and demonstrate Disconnect TikTok or Delete my data.
 
-Recommended checks:
+Use an original or otherwise authorized test video. Do not expose credentials, tokens, the `.env` file, private browser data, or a Client Secret while recording.
 
-1. Open every page from the header, Home policy links, and footer.
-2. Test the mobile navigation and keyboard focus.
-3. Check the workflow, cards, and policy tables at narrow widths.
-4. Confirm every email link uses `alelseixas@gmail.com`.
-5. Confirm Terms and Privacy are visible directly in the Home body.
-6. Scan the public repository for credentials before every deployment.
+## What to show in the App Review video
 
-## GitHub Pages
+Record one clear, continuous flow that shows:
 
-Expected configuration:
+1. the public Home page, product explanation, Terms, Privacy, Support, and Data Deletion links;
+2. the real creator tool with no pre-authorized account;
+3. TikTok Login Kit and the exact requested scopes;
+4. the same authorized creator account displayed after callback;
+5. selection and playback of the exact video being sent;
+6. the explicit consent control and creator-initiated upload action;
+7. real upload progress and the status returned through Content Posting API;
+8. the draft arriving in that creator's TikTok inbox or editor;
+9. TikTok's own caption, privacy, comments, and other available controls; and
+10. the creator making the final publication decision, followed by revocation or deletion controls if the review form asks for them.
 
-- deployment branch: `main`;
-- deployment directory: repository root;
-- custom build: none;
-- Jekyll processing: disabled by `.nojekyll`.
+The recording must demonstrate a real Sandbox transaction. Do not replace a failed API step with a mock screen or edited result.
 
-After committing and pushing, wait for the GitHub Pages workflow to finish and verify the live URLs below. Do not rename `terms.html` or `privacy.html`; those paths are already registered in the TikTok Developer Portal.
+## Intentional limits
 
-## What this repository does not contain
+- One creator-controlled TikTok connection per browser session.
+- One local video selected and confirmed per transfer.
+- Draft upload only; no Direct Post and no automatic publication.
+- No caption, privacy, comments, Duet, or Stitch selector in Além do Hit; TikTok presents those choices for the draft.
+- No payments, subscriptions, teams, analytics dashboard, social feed, or administrative product area.
+- No permanent media library; selected videos are normally deleted immediately after the transfer attempt, with startup/hourly cleanup for recognized temporary files older than six hours.
+- Access may remain limited to TikTok Sandbox users until review and audit are complete.
 
-This repository is intentionally limited to the public website. It does not contain:
+TikTok approval is not guaranteed by the website or implementation. Approval also depends on the Developer Portal configuration, account eligibility, review evidence, compliance with current TikTok policies, and the behavior observed by TikTok reviewers.
 
-- TikTok OAuth implementation or redirect handling;
-- client secrets, authorization tokens, or creator credentials;
-- Content Posting API calls;
-- uploads, webhooks, queues, or protected media hosting;
-- user accounts, authentication, a database, or a dashboard; or
-- a simulated TikTok login or publishing interface.
+## Security and privacy summary
 
-GitHub Pages cannot securely perform a confidential OAuth exchange or store creator tokens. Any real TikTok authorization and publishing flow must remain in the desktop application's secure operational architecture and any backend that flow genuinely requires.
+- The Client Secret and OAuth token exchange remain on the backend.
+- Access and refresh tokens are encrypted with AES-256-GCM before SQLite storage.
+- The browser receives an opaque, essential session cookie rather than TikTok tokens.
+- OAuth state and CSRF tokens protect authorization and state-changing requests.
+- The video is previewed locally before consent and reaches the backend only after confirmation.
+- Temporary video files are removed after transfer completion, failure, or expiry.
+- Disconnect revokes the TikTok authorization and deletes the stored connection.
+- The data-deletion route removes records controlled by the application for the active session.
+- Personal information and TikTok user data are not sold or used for behavioral advertising.
 
-## Website checklist
-
-- [x] Public Home page
-- [x] Public About & How It Works page
-- [x] Public Support page
-- [x] Public Privacy Policy at `privacy.html`
-- [x] Public Terms of Service at `terms.html`
-- [x] Public revocation and data deletion page
-- [x] Short, transparent TikTok integration explanation
-- [x] Terms and Privacy visible directly on Home
-- [x] Primary branding is Além do Hit
-- [x] Music Short Factory described only as an internal workflow
-- [x] No backend, database, authentication, or framework
-- [x] No secret or production credential intentionally stored in the repository
-- [x] Responsive desktop and mobile layouts
-- [x] Open Graph image, `404.html`, `robots.txt`, `sitemap.xml`, and `.nojekyll` preserved
-- [x] Relative links compatible with the GitHub Pages project path
-- [ ] Final live URLs verified after deployment
-
-## TikTok App Review work outside this repository
-
-The website supplies a professional public identity, support contact, legal documents, and integration transparency. It cannot by itself complete App Review. Before submission, verify in the real application and Developer Portal that:
-
-- the app name, icon, description, Website URL, Terms URL, and Privacy URL are consistent;
-- only the platform products and scopes genuinely used by the demonstrated app are requested;
-- OAuth redirect handling and confidential credentials are implemented securely outside GitHub Pages;
-- the creator authorizes the destination TikTok account;
-- the real publishing screen uses the latest creator information returned by TikTok and shows only available privacy and interaction settings;
-- the creator can review the video and editable metadata and explicitly confirm before transfer or Direct Post;
-- revocation and deletion requests sent to `alelseixas@gmail.com` can be handled operationally;
-- the required sandbox demonstration, product review, and Content Posting API audit materials are complete; and
-- all current TikTok developer policies and review instructions are checked again immediately before submission.
-
-The website does not guarantee approval. TikTok evaluates the functioning application, requested permissions, portal configuration, and review evidence in addition to the public website.
-
-## Important URLs
+## Public URLs
 
 - Home: <https://aleseixas.github.io/music-short-factory-site/>
+- Creator tool mirror: <https://aleseixas.github.io/music-short-factory-site/app.html>
 - About & How It Works: <https://aleseixas.github.io/music-short-factory-site/about.html>
 - Support: <https://aleseixas.github.io/music-short-factory-site/support.html>
 - Privacy Policy: <https://aleseixas.github.io/music-short-factory-site/privacy.html>
 - Terms of Service: <https://aleseixas.github.io/music-short-factory-site/terms.html>
 - Data Deletion: <https://aleseixas.github.io/music-short-factory-site/data-deletion.html>
 
+## Review readiness checklist
+
+- [ ] Functional HTTPS deployment is live.
+- [ ] App Name and icon match the Developer Portal.
+- [ ] Website, Privacy, Terms, and Redirect URLs match production exactly.
+- [ ] Production origin is a trusted domain and the configured URL properties are verified.
+- [ ] Login Kit and Content Posting API are enabled.
+- [ ] Only `user.info.basic` and `video.upload` are requested.
+- [ ] Sandbox reviewer/test account is authorized.
+- [ ] OAuth callback completes without exposing credentials.
+- [ ] Selected video preview works before confirmation.
+- [ ] Draft upload is disabled until explicit consent.
+- [ ] Real upload reaches the authorized TikTok inbox.
+- [ ] Final settings and publication are completed inside TikTok.
+- [ ] Disconnect and data deletion work.
+- [ ] Temporary uploaded video is removed from the backend.
+- [ ] Repository and deployment contain no committed secrets or user media.
+- [ ] Continuous App Review demonstration video is recorded.
+
 ## Contact
 
-Além do Hit: [alelseixas@gmail.com](mailto:alelseixas@gmail.com)
+Além do Hit Support: [alelseixas@gmail.com](mailto:alelseixas@gmail.com)
