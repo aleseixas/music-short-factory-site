@@ -15,11 +15,11 @@ const STATE_BYTES = 32;
 const GCM_IV_BYTES = 12;
 const GCM_TAG_BYTES = 16;
 
-function randomOpaque(bytes) {
+export function randomOpaque(bytes) {
   return randomBytes(bytes).toString("base64url");
 }
 
-function hash(value) {
+export function hash(value) {
   return createHash("sha256").update(value, "utf8").digest("hex");
 }
 
@@ -85,7 +85,7 @@ export function decryptToken(payload, key) {
   }
 }
 
-function parseScopes(value) {
+export function parseScopes(value) {
   try {
     const parsed = JSON.parse(value || "[]");
     return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string") : [];
@@ -94,15 +94,23 @@ function parseScopes(value) {
   }
 }
 
-function serializePublish(row) {
+function storedInteger(value, name) {
+  const parsed = Number(value);
+  if (!Number.isSafeInteger(parsed)) {
+    throw new Error(`Invalid stored integer: ${name}`);
+  }
+  return parsed;
+}
+
+export function serializePublish(row) {
   if (!row) return null;
   return {
     publishId: row.publish_id,
     status: row.status,
-    uploadedBytes: row.uploaded_bytes ?? 0,
+    uploadedBytes: storedInteger(row.uploaded_bytes ?? 0, "uploaded_bytes"),
     failReason: row.fail_reason || null,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
+    createdAt: storedInteger(row.created_at, "created_at"),
+    updatedAt: storedInteger(row.updated_at, "updated_at"),
   };
 }
 
@@ -161,6 +169,7 @@ export function createStore({
   `);
 
   const statements = {
+    ping: db.prepare("SELECT 1 AS value"),
     insertSession: db.prepare(`
       INSERT INTO sessions
         (session_hash, csrf_token, created_at, expires_at)
@@ -470,6 +479,7 @@ export function createStore({
   }
 
   return Object.freeze({
+    ping: () => Boolean(statements.ping.get()?.value),
     cleanupExpired,
     createSession,
     getSession,

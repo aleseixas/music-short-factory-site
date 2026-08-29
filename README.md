@@ -38,7 +38,7 @@ Creator browser
 Minimal Node/Express backend
   ├─ opaque essential session cookie + CSRF protection
   ├─ OAuth state and callback validation
-  ├─ encrypted TikTok tokens in SQLite
+  ├─ encrypted TikTok tokens in PostgreSQL
   ├─ temporary video validation and transfer
   └─ TikTok draft-upload status
           │
@@ -46,6 +46,10 @@ Minimal Node/Express backend
 TikTok Login Kit + Content Posting API
   └─ creator finishes the draft in TikTok
 ```
+
+Production uses PostgreSQL whenever `DATABASE_URL` is configured. SQLite remains
+the zero-setup local development store and is not allowed when
+`NODE_ENV=production`.
 
 The backend must serve the frontend and API from the same HTTPS origin in the functional review deployment. GitHub Pages can continue to host the public marketing and legal mirror, but it cannot execute OAuth, protect client credentials, or receive video uploads. When `app.html` is opened on GitHub Pages, it reports that the secure backend is unavailable instead of simulating a working connection.
 
@@ -79,7 +83,7 @@ The backend must serve the frontend and API from the same HTTPS origin in the fu
 | `GET /api/publish/status?publishId=...` | Checks the status of the session's specified TikTok draft transfer |
 | `POST /api/disconnect` | Requires CSRF protection, revokes TikTok access, and deletes the stored connection |
 | `POST /api/delete-data` | Requires CSRF protection and deletes operator-controlled data for the browser session |
-| `GET /api/health` | Minimal health check for deployment monitoring |
+| `GET /api/health` | Checks that the application and configured database are available |
 
 ## Local setup
 
@@ -108,6 +112,9 @@ Put the generated value and the Sandbox credentials in `.env`, then run:
 npm start
 ```
 
+Leave `DATABASE_URL` unset locally to use SQLite. A local PostgreSQL URL can be
+supplied when the production adapter itself needs to be exercised.
+
 The pages and non-OAuth API checks can run locally at `http://localhost:3000/`. TikTok OAuth requires an externally reachable HTTPS origin, including during Sandbox testing. Use a trusted HTTPS development tunnel or the production-like HTTPS host, set `PUBLIC_ORIGIN` to that origin, set `TIKTOK_REDIRECT_URI` to the same origin plus `/auth/tiktok/callback`, register that exact Redirect URI in the Developer Portal, and open `/app.html` through the HTTPS origin.
 
 Run the automated checks with:
@@ -130,33 +137,45 @@ npm test
 | `SESSION_COOKIE_NAME` | Opaque essential-session cookie name; use a secure `__Host-` name in production |
 | `SESSION_TTL_SECONDS` | Session lifetime |
 | `OAUTH_STATE_TTL_SECONDS` | Short OAuth state lifetime |
-| `DATABASE_PATH` | Persistent SQLite database path |
-| `UPLOAD_DIR` | Private temporary upload directory |
+| `DATABASE_URL` | Neon PostgreSQL connection URL with `sslmode=require`; required and secret in production |
+| `DATABASE_PATH` | Local SQLite path; ignored when `DATABASE_URL` is present |
+| `UPLOAD_DIR` | Private temporary upload directory; `/tmp/adh-uploads` on Render |
 | `MAX_UPLOAD_BYTES` | Deployment upload limit, within TikTok's applicable limit |
-| `TRUST_PROXY` | Enable only when the production service is behind a trusted HTTPS proxy |
+| `TRUST_PROXY` | Set to `1` behind the Render HTTPS proxy |
 
 Never place `.env`, SQLite files, uploaded videos, client secrets, access tokens, or refresh tokens in Git or a public frontend.
 
 ## Production deployment
 
-The functional creator app cannot run on GitHub Pages alone. Deploy the Node service to an HTTPS host that supports:
-
-- a persistent writable volume for `DATABASE_PATH`;
-- a private writable temporary directory for `UPLOAD_DIR`;
-- request bodies large enough for the configured `MAX_UPLOAD_BYTES`;
-- long enough request timeouts for server-mediated video transfer;
-- secret environment variables; and
-- a stable public origin and callback URL.
+The zero-cost review deployment uses one Render Free Web Service for the static
+pages and Node backend, plus one Neon Free PostgreSQL database. GitHub `main` is
+the only code source and Render auto-deploys that branch. Do not attach a Render
+persistent disk: account state belongs in PostgreSQL, while selected videos exist
+only temporarily under `/tmp/adh-uploads` and are removed after each attempt.
 
 Recommended sequence:
 
-1. Provision the HTTPS service and persistent volume.
-2. Set every production environment variable in the hosting provider, not in source control.
-3. Set `NODE_ENV=production` and make `PUBLIC_ORIGIN` the exact HTTPS origin.
-4. Set `TIKTOK_REDIRECT_URI` to the exact same origin plus `/auth/tiktok/callback`.
-5. Deploy and verify `GET /api/health`.
-6. Open `/app.html`, complete the Sandbox authorization, and perform one test draft transfer.
-7. Verify the temporary upload directory no longer contains the transferred file.
+1. Create the Neon Free database and copy its PostgreSQL connection URL without
+   placing it in a local file or Git.
+2. Connect the GitHub repository and `main` branch to a Render Web Service using
+   the existing Dockerfile and the Free instance type.
+3. Do not create a persistent disk, Redis, Key Value instance, or media storage.
+4. Configure Render secrets for `DATABASE_URL`, the TikTok credentials, and
+   `TOKEN_ENCRYPTION_KEY`.
+5. Set `NODE_ENV=production`, `TRUST_PROXY=1`, and
+   `UPLOAD_DIR=/tmp/adh-uploads`.
+6. After Render assigns the real HTTPS hostname, set `PUBLIC_ORIGIN` to that
+   origin and `TIKTOK_REDIRECT_URI` to the same origin plus
+   `/auth/tiktok/callback`.
+7. Configure `/api/health` as the Render health-check path and confirm it returns
+   HTTP 200 with both application and database available.
+8. Register the exact URLs in the TikTok Developer Portal, authorize the Sandbox
+   account, and perform one real draft transfer.
+
+Free services have operational limits. Render can sleep after inactivity and
+Neon can suspend idle compute, so warm and verify the complete flow immediately
+before recording the review demonstration. Staying within each provider's Free
+quotas keeps this deployment at zero cost; no paid plan is required by the code.
 
 The static GitHub Pages site remains available at:
 
@@ -230,7 +249,7 @@ TikTok approval is not guaranteed by the website or implementation. Approval als
 ## Security and privacy summary
 
 - The Client Secret and OAuth token exchange remain on the backend.
-- Access and refresh tokens are encrypted with AES-256-GCM before SQLite storage.
+- Access and refresh tokens are encrypted with AES-256-GCM before PostgreSQL or local SQLite storage.
 - The browser receives an opaque, essential session cookie rather than TikTok tokens.
 - OAuth state and CSRF tokens protect authorization and state-changing requests.
 - The video is previewed locally before consent and reaches the backend only after confirmation.

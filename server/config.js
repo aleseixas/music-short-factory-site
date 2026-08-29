@@ -52,6 +52,28 @@ function absoluteHttpUrl(value, name, { httpsRequired = false } = {}) {
   return url;
 }
 
+function optionalPostgresUrl(env) {
+  const value = env.DATABASE_URL?.trim();
+  if (!value) return null;
+
+  let url;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error("DATABASE_URL must be a valid PostgreSQL URL");
+  }
+
+  if (
+    !["postgres:", "postgresql:"].includes(url.protocol) ||
+    !url.hostname ||
+    !url.pathname ||
+    url.pathname === "/"
+  ) {
+    throw new Error("DATABASE_URL must be a valid PostgreSQL URL");
+  }
+  return value;
+}
+
 export function parseEncryptionKey(value) {
   const raw = value.trim();
   let key;
@@ -71,6 +93,16 @@ export function parseEncryptionKey(value) {
 export function createConfig(env = process.env, cwd = process.cwd()) {
   const nodeEnv = env.NODE_ENV?.trim() || "development";
   const isProduction = nodeEnv === "production";
+  const databaseUrl = optionalPostgresUrl(env);
+  if (isProduction && !databaseUrl) {
+    throw new Error("DATABASE_URL is required in production");
+  }
+  if (
+    isProduction &&
+    new URL(databaseUrl).searchParams.get("sslmode") !== "require"
+  ) {
+    throw new Error("DATABASE_URL must set sslmode=require in production");
+  }
   const publicOriginUrl = absoluteHttpUrl(
     required(env, "PUBLIC_ORIGIN"),
     "PUBLIC_ORIGIN",
@@ -137,8 +169,13 @@ export function createConfig(env = process.env, cwd = process.cwd()) {
         min: 60,
         max: 30 * 60,
       }) * 1000,
+    databaseUrl,
     databasePath: resolve(cwd, env.DATABASE_PATH?.trim() || "./data/app.sqlite"),
-    uploadDir: resolve(cwd, env.UPLOAD_DIR?.trim() || "./data/uploads"),
+    uploadDir: resolve(
+      cwd,
+      env.UPLOAD_DIR?.trim() ||
+        (isProduction ? "/tmp/adh-uploads" : "./data/uploads"),
+    ),
     maxUploadBytes: integer(env, "MAX_UPLOAD_BYTES", 512 * 1024 * 1024, {
       min: 1,
       max: MAX_TIKTOK_VIDEO_BYTES,

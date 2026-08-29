@@ -28,6 +28,7 @@ test("configuration fixes the least-privilege TikTok scopes", () => {
   ]);
   assert.equal(config.cookieName, "adh_session");
   assert.equal(config.cookieSecure, false);
+  assert.equal(config.databaseUrl, null);
 });
 
 test("production requires HTTPS and a same-origin callback", () => {
@@ -37,12 +38,19 @@ test("production requires HTTPS and a same-origin callback", () => {
       PUBLIC_ORIGIN: "https://creator.example",
       TIKTOK_REDIRECT_URI:
         "https://creator.example/auth/tiktok/callback",
+      DATABASE_URL: "postgresql://test:test@database.example/app?sslmode=require",
+      TRUST_PROXY: "1",
     }),
     process.cwd(),
   );
   assert.equal(config.cookieName, "__Host-adh_session");
   assert.equal(config.cookieSecure, true);
-  assert.equal(config.trustProxy, false);
+  assert.equal(config.trustProxy, true);
+  assert.equal(
+    config.databaseUrl,
+    "postgresql://test:test@database.example/app?sslmode=require",
+  );
+  assert.match(config.uploadDir, /tmp[\\/]adh-uploads$/);
 
   assert.throws(
     () =>
@@ -52,6 +60,8 @@ test("production requires HTTPS and a same-origin callback", () => {
           PUBLIC_ORIGIN: "https://creator.example",
           TIKTOK_REDIRECT_URI:
             "https://different.example/auth/tiktok/callback",
+          DATABASE_URL:
+            "postgres://test:test@database.example/app?sslmode=require",
         }),
       ),
     /must be exactly/,
@@ -63,6 +73,48 @@ test("production requires HTTPS and a same-origin callback", () => {
         baseEnv({ SESSION_COOKIE_NAME: "__Secure-test-session" }),
       ),
     /requires an HTTPS PUBLIC_ORIGIN/,
+  );
+});
+
+test("production requires PostgreSQL while development keeps SQLite", () => {
+  assert.throws(
+    () =>
+      createConfig(
+        baseEnv({
+          NODE_ENV: "production",
+          PUBLIC_ORIGIN: "https://creator.example",
+          TIKTOK_REDIRECT_URI:
+            "https://creator.example/auth/tiktok/callback",
+        }),
+      ),
+    /DATABASE_URL is required in production/,
+  );
+
+  assert.throws(
+    () =>
+      createConfig(
+        baseEnv({
+          NODE_ENV: "production",
+          PUBLIC_ORIGIN: "https://creator.example",
+          TIKTOK_REDIRECT_URI:
+            "https://creator.example/auth/tiktok/callback",
+          DATABASE_URL: "postgresql://test:test@database.example/app",
+        }),
+      ),
+    /sslmode=require/,
+  );
+
+  assert.throws(
+    () => createConfig(baseEnv({ DATABASE_URL: "https://database.example/app" })),
+    /valid PostgreSQL URL/,
+  );
+
+  const development = createConfig(
+    baseEnv({ DATABASE_URL: "postgres://test:test@localhost/local_app" }),
+  );
+  assert.equal(
+    development.databaseUrl,
+    "postgres://test:test@localhost/local_app",
   );
 });
 

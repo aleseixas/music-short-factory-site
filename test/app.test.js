@@ -27,6 +27,15 @@ function testConfig(uploadDir) {
   return { ...parsed, databasePath: ":memory:", uploadDir };
 }
 
+function asyncStore(store) {
+  return Object.fromEntries(
+    Object.entries(store).map(([name, value]) => [
+      name,
+      typeof value === "function" ? async (...args) => value(...args) : value,
+    ]),
+  );
+}
+
 async function listen(app) {
   const server = app.listen(0, "127.0.0.1");
   await once(server, "listening");
@@ -46,7 +55,8 @@ async function close(server) {
 test("Express serves only public files and creates a safe anonymous session", async () => {
   const uploadDir = await mkdtemp(join(tmpdir(), "adh-app-static-test-"));
   const config = testConfig(uploadDir);
-  const store = createStore(config);
+  const sqliteStore = createStore(config);
+  const store = asyncStore(sqliteStore);
   const tiktokClient = {};
   const app = await createApp({ config, store, tiktokClient });
   const { server, origin } = await listen(app);
@@ -74,9 +84,40 @@ test("Express serves only public files and creates a safe anonymous session", as
     assert.equal(typeof body.csrfToken, "string");
     assert.deepEqual(body.scopes, []);
     assert.equal(JSON.stringify(body).includes("test-client-secret"), false);
+
+    const health = await fetch(`${origin}/api/health`);
+    assert.equal(health.status, 200);
+    assert.deepEqual(await health.json(), { status: "ok", database: "ok" });
   } finally {
     await close(server);
-    store.close();
+    sqliteStore.close();
+    await rm(uploadDir, { recursive: true, force: true });
+  }
+});
+
+test("health check reports an unavailable persistence layer", async () => {
+  const uploadDir = await mkdtemp(join(tmpdir(), "adh-app-health-test-"));
+  const config = testConfig(uploadDir);
+  const sqliteStore = createStore(config);
+  const store = {
+    ...asyncStore(sqliteStore),
+    ping: async () => {
+      throw new Error("database unavailable");
+    },
+  };
+  const app = await createApp({ config, store, tiktokClient: {} });
+  const { server, origin } = await listen(app);
+
+  try {
+    const response = await fetch(`${origin}/api/health`);
+    assert.equal(response.status, 503);
+    assert.deepEqual(await response.json(), {
+      status: "unavailable",
+      database: "unavailable",
+    });
+  } finally {
+    await close(server);
+    sqliteStore.close();
     await rm(uploadDir, { recursive: true, force: true });
   }
 });
@@ -84,9 +125,10 @@ test("Express serves only public files and creates a safe anonymous session", as
 test("connected creator confirms one real draft transfer and checks status", async () => {
   const uploadDir = await mkdtemp(join(tmpdir(), "adh-app-upload-test-"));
   const config = testConfig(uploadDir);
-  const store = createStore(config);
-  const anonymous = store.createSession();
-  const connected = store.attachConnectionAndRotate(anonymous.sessionId, {
+  const sqliteStore = createStore(config);
+  const store = asyncStore(sqliteStore);
+  const anonymous = sqliteStore.createSession();
+  const connected = sqliteStore.attachConnectionAndRotate(anonymous.sessionId, {
     openId: "open-id-reviewer",
     displayName: "Sandbox Creator",
     avatarUrl: null,
@@ -114,6 +156,13 @@ test("connected creator confirms one real draft transfer and checks status", asy
     },
   };
   const uploadFetch = async (_url, options) => {
+    assert.equal(
+      sqliteStore.getPublish(
+        connected.sessionId,
+        "v_inbox_file~v2.integration-test",
+      ).status,
+      "UPLOADING",
+    );
     let bytes = 0;
     for await (const chunk of options.body) bytes += chunk.length;
     assert.equal(bytes, 1024);
@@ -202,11 +251,11 @@ test("connected creator confirms one real draft transfer and checks status", asy
     assert.equal(disconnected.status, 200);
     assert.equal((await disconnected.json()).authorizationRevoked, true);
     assert.equal(revokedToken, "act.sandbox");
-    assert.equal(store.getSession(connected.sessionId).connected, false);
+    assert.equal(sqliteStore.getSession(connected.sessionId).connected, false);
     assert.deepEqual(await readdir(uploadDir), []);
   } finally {
     await close(server);
-    store.close();
+    sqliteStore.close();
     await rm(uploadDir, { recursive: true, force: true });
   }
 });

@@ -7,6 +7,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import express from "express";
 import multer from "multer";
 import { createConfig, REQUIRED_TIKTOK_SCOPES } from "./config.js";
+import { createPostgresStore } from "./postgres-store.js";
 import { createStore } from "./store.js";
 import {
   buildAuthorizeUrl,
@@ -235,9 +236,9 @@ export async function createApp({
     return parseCookies(req.headers.cookie)[config.cookieName] || null;
   }
 
-  function requireSession(req, _res, next) {
+  async function requireSession(req, _res, next) {
     const sessionId = sessionIdFromRequest(req);
-    const session = store.getSession(sessionId);
+    const session = await store.getSession(sessionId);
     if (!session) {
       next(publicError(401, "session_required", "Start a new session and try again."));
       return;
@@ -247,9 +248,9 @@ export async function createApp({
     next();
   }
 
-  function requireCsrf(req, _res, next) {
+  async function requireCsrf(req, _res, next) {
     const csrfToken = req.get("X-CSRF-Token");
-    if (!store.validateCsrf(req.appSessionId, csrfToken)) {
+    if (!(await store.validateCsrf(req.appSessionId, csrfToken))) {
       next(publicError(403, "invalid_csrf", "The request could not be verified."));
       return;
     }
@@ -289,7 +290,7 @@ export async function createApp({
   }
 
   async function validAccessToken(sessionId) {
-    const connection = store.getConnection(sessionId);
+    const connection = await store.getConnection(sessionId);
     if (!connection) {
       throw publicError(401, "tiktok_not_connected", "Connect a TikTok account first.");
     }
@@ -319,7 +320,7 @@ export async function createApp({
       );
     }
     const times = tokenTimes(refreshed, currentTime);
-    store.updateTokens(sessionId, {
+    await store.updateTokens(sessionId, {
       openId: refreshed.openId,
       scopes: refreshed.scopes,
       accessToken: refreshed.accessToken,
@@ -344,17 +345,23 @@ export async function createApp({
     }
   }
 
-  app.get("/api/health", (_req, res) => {
-    res.set("Cache-Control", "no-store").json({ status: "ok" });
+  app.get("/api/health", async (_req, res) => {
+    res.set("Cache-Control", "no-store");
+    try {
+      await store.ping();
+      res.json({ status: "ok", database: "ok" });
+    } catch {
+      res.status(503).json({ status: "unavailable", database: "unavailable" });
+    }
   });
 
-  app.get("/api/session", (req, res) => {
+  app.get("/api/session", async (req, res) => {
     res.set("Cache-Control", "no-store");
-    let session = store.getSession(sessionIdFromRequest(req));
+    let session = await store.getSession(sessionIdFromRequest(req));
     if (!session) {
-      const created = store.createSession();
+      const created = await store.createSession();
       setSessionCookie(res, config, created);
-      session = store.getSession(created.sessionId);
+      session = await store.getSession(created.sessionId);
     }
 
     res.json({
@@ -377,18 +384,21 @@ export async function createApp({
     });
   });
 
-  app.get("/auth/tiktok", (req, res, next) => {
+  app.get("/auth/tiktok", async (req, res, next) => {
     try {
       res.set("Cache-Control", "no-store");
       let sessionId = sessionIdFromRequest(req);
-      let session = store.getSession(sessionId);
+      let session = await store.getSession(sessionId);
       if (!session) {
-        const created = store.createSession();
+        const created = await store.createSession();
         sessionId = created.sessionId;
-        session = store.getSession(sessionId);
+        session = await store.getSession(sessionId);
         setSessionCookie(res, config, created);
       }
-      const state = store.createOAuthState(sessionId, config.oauthStateTtlMs);
+      const state = await store.createOAuthState(
+        sessionId,
+        config.oauthStateTtlMs,
+      );
       if (!state) throw publicError(401, "session_expired", "Start again.");
       res.redirect(
         302,
@@ -409,7 +419,11 @@ export async function createApp({
     const state = scalarQuery(req.query.state);
     const redirect = new URL("/app.html", config.publicOrigin);
 
-    if (!sessionId || !state || !store.consumeOAuthState(sessionId, state)) {
+    if (
+      !sessionId ||
+      !state ||
+      !(await store.consumeOAuthState(sessionId, state))
+    ) {
       redirect.searchParams.set("error", "invalid_oauth_state");
       res.redirect(303, redirect.toString());
       return;
@@ -442,7 +456,7 @@ export async function createApp({
         throw new TikTokApiError("user_identity_mismatch", 502);
       }
       const times = tokenTimes(tokens);
-      const rotated = store.attachConnectionAndRotate(sessionId, {
+      const rotated = await store.attachConnectionAndRotate(sessionId, {
         ...profile,
         scopes: tokens.scopes,
         accessToken: tokens.accessToken,
@@ -491,15 +505,15 @@ export async function createApp({
           accessToken,
           tiktokClient,
           fetchImpl,
-          onInitialized: ({ publishId }) => {
-            publish = store.recordPublish(
+          onInitialized: async ({ publishId }) => {
+            publish = await store.recordPublish(
               req.appSessionId,
               publishId,
               "UPLOADING",
             );
           },
         });
-        publish = store.updatePublish(
+        publish = await store.updatePublish(
           req.appSessionId,
           result.publishId,
           {
@@ -511,11 +525,15 @@ export async function createApp({
         res.status(202).set("Cache-Control", "no-store").json({ publish });
       } catch (error) {
         if (publish?.publishId) {
-          store.updatePublish(req.appSessionId, publish.publishId, {
-            status: "TRANSFER_UNCONFIRMED",
-            uploadedBytes: 0,
-            failReason: null,
-          });
+          await store
+            .updatePublish(req.appSessionId, publish.publishId, {
+              status: "TRANSFER_UNCONFIRMED",
+              uploadedBytes: 0,
+              failReason: null,
+            })
+            .catch(() => {
+              console.error("Upload failure status persistence failed");
+            });
         }
         next(error);
       } finally {
@@ -542,7 +560,7 @@ export async function createApp({
         ) {
           throw publicError(400, "invalid_publish_id", "Invalid upload reference.");
         }
-        if (!store.getPublish(req.appSessionId, publishId)) {
+        if (!(await store.getPublish(req.appSessionId, publishId))) {
           throw publicError(404, "publish_not_found", "Upload reference not found.");
         }
         const accessToken = await validAccessToken(req.appSessionId);
@@ -550,7 +568,7 @@ export async function createApp({
           accessToken,
           publishId,
         });
-        const publish = store.updatePublish(
+        const publish = await store.updatePublish(
           req.appSessionId,
           publishId,
           status,
@@ -568,12 +586,12 @@ export async function createApp({
     requireCsrf,
     async (req, res, next) => {
       try {
-        const connection = store.getConnection(req.appSessionId);
+        const connection = await store.getConnection(req.appSessionId);
         const authorizationRevoked = await tryRevokeConnection(
           req.appSessionId,
           connection,
         );
-        if (connection) store.disconnect(req.appSessionId);
+        if (connection) await store.disconnect(req.appSessionId);
         res.set("Cache-Control", "no-store").json({
           disconnected: true,
           authorizationRevoked,
@@ -592,12 +610,12 @@ export async function createApp({
 
   async function deleteData(req, res, next) {
     try {
-      const connection = store.getConnection(req.appSessionId);
+      const connection = await store.getConnection(req.appSessionId);
       const authorizationRevoked = await tryRevokeConnection(
         req.appSessionId,
         connection,
       );
-      store.deleteUserData(req.appSessionId);
+      await store.deleteUserData(req.appSessionId);
       clearSessionCookie(res, config);
       res.set("Cache-Control", "no-store").json({
         deleted: true,
@@ -754,28 +772,37 @@ export async function createApp({
 
 export async function startServer(env = process.env) {
   const config = createConfig(env, PROJECT_ROOT);
-  const store = createStore(config);
+  const store = config.databaseUrl
+    ? await createPostgresStore(config)
+    : createStore(config);
   const tiktokClient = createTikTokClient(config);
   await cleanupTemporaryDirectory(config.uploadDir).catch(() => {
     console.error("Startup upload cleanup failed");
   });
   const app = await createApp({ config, store, tiktokClient });
-  const server = app.listen(config.port, () => {
+  const server = app.listen(config.port, "0.0.0.0", () => {
     console.log(`Além do Hit server listening on port ${config.port}`);
   });
 
   const cleanupTimer = setInterval(() => {
-    store.cleanupExpired();
-    cleanupTemporaryDirectory(config.uploadDir).catch(() => {
-      console.error("Scheduled upload cleanup failed");
+    Promise.all([
+      Promise.resolve(store.cleanupExpired()),
+      cleanupTemporaryDirectory(config.uploadDir),
+    ]).catch(() => {
+      console.error("Scheduled cleanup failed");
     });
   }, 60 * 60 * 1000);
   cleanupTimer.unref();
 
+  let shuttingDown = false;
   function shutdown() {
+    if (shuttingDown) return;
+    shuttingDown = true;
     clearInterval(cleanupTimer);
-    server.close(() => {
-      store.close();
+    server.close(async () => {
+      await Promise.resolve(store.close()).catch(() => {
+        console.error("Database shutdown failed");
+      });
       process.exit(0);
     });
   }
