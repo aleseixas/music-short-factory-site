@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>About &amp; How It Works | Além do Hit</title>
-  <meta name="description" content="Learn how creators use Além do Hit to preview finished short-form music videos and send them as TikTok drafts after explicit confirmation.">
+  <meta name="description" content="Learn how creators use Além do Hit to preview finished short-form music videos and choose a TikTok draft or Direct Post after explicit confirmation.">
   <meta name="theme-color" content="#090b0b">
   <link rel="canonical" href="https://aleseixas.github.io/music-short-factory-site/about.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Além do Hit">
   <meta property="og:title" content="About &amp; How It Works | Além do Hit">
-  <meta property="og:description" content="A focused creator workflow for previewing finished music stories and sending confirmed videos as TikTok drafts.">
+  <meta property="og:description" content="A focused creator workflow for previewing finished music stories and choosing a confirmed TikTok draft or Direct Post.">
   <meta property="og:url" content="https://aleseixas.github.io/music-short-factory-site/about.html">
   <meta property="og:image" content="https://aleseixas.github.io/music-short-factory-site/assets/alem-do-hit-og.png">
   <meta property="og:image:width" content="1200">
@@ -35,17 +35,17 @@
       <div class="wrap page-hero-inner">
         <p class="eyebrow">About the creator tool</p>
         <h1 id="about-title">A focused workflow for short-form music storytelling.</h1>
-        <p class="lead">Além do Hit gives creators a deliberate path for reviewing a finished, research-led music story and sending it as a draft to a TikTok account they authorize.</p>
+        <p class="lead">Além do Hit gives creators a deliberate path for reviewing a finished, research-led music story and sending it as a draft or Direct Post to a TikTok account they authorize.</p>
         <nav class="page-meta" aria-label="Page sections"><a href="#purpose">Purpose</a><a href="#workflow">How it works</a><a href="#technology">Music Short Factory</a><a href="#principles">Creator control</a></nav>
       </div>
     </section>
 
     <section class="section section-tinted" id="purpose" aria-labelledby="purpose-title">
       <div class="wrap split">
-        <div><p class="eyebrow">Purpose</p><h2 id="purpose-title">A controlled path from a finished music story to a TikTok draft.</h2></div>
+        <div><p class="eyebrow">Purpose</p><h2 id="purpose-title">A controlled path from a finished music story to TikTok.</h2></div>
         <div>
           <p class="section-intro">The tool is designed for concise educational and documentary stories about songs, artists, recording processes, production choices, and music culture.</p>
-          <p>It keeps the workflow narrow: prepare the story and video, connect a creator-owned TikTok account, preview the selected file, explicitly confirm the upload, and finish the draft inside TikTok.</p>
+          <p>It keeps the workflow narrow: prepare the story and video, connect a creator-owned TikTok account, preview the selected file, choose draft or Direct Post, review the available settings, and explicitly confirm the action.</p>
         </div>
       </div>
     </section>
@@ -67,15 +67,15 @@
     <section class="section section-tinted" id="workflow" aria-labelledby="workflow-title">
       <div class="wrap">
         <div class="section-heading">
-          <div><p class="eyebrow">How it works</p><h2 id="workflow-title">Five steps from preparation to a TikTok draft.</h2></div>
-          <p>The workflow uses TikTok's Upload API. It does not Direct Post: the creator completes the final editing and publishing decision inside TikTok.</p>
+          <div><p class="eyebrow">How it works</p><h2 id="workflow-title">Five steps from preparation to a confirmed TikTok action.</h2></div>
+          <p>The creator may send a draft with <code>video.upload</code> or choose Direct Post with <code>video.publish</code>. Both paths require an authorized account, preview, and explicit confirmation.</p>
         </div>
         <ol class="workflow-detailed">
           <li><div class="step-number">01</div><div><p class="eyebrow">Prepare</p><h3>Create the short-form music video.</h3><p>Before using the upload screen, the creator assembles research, a script, selected media, narration, captions, and editing into the finished vertical video they intend to send.</p></div></li>
-          <li><div class="step-number">02</div><div><p class="eyebrow">Connect</p><h3>Authorize your own TikTok account.</h3><p>TikTok Login Kit presents the requested <code>user.info.basic</code> and <code>video.upload</code> permissions. The creator decides whether to authorize the connection.</p></div></li>
+          <li><div class="step-number">02</div><div><p class="eyebrow">Connect</p><h3>Authorize your own TikTok account.</h3><p>TikTok Login Kit presents the requested <code>user.info.basic</code>, <code>video.upload</code>, and <code>video.publish</code> permissions. The creator decides whether to authorize the connection.</p></div></li>
           <li><div class="step-number">03</div><div><p class="eyebrow">Preview</p><h3>Review the exact video before transfer.</h3><p>The creator tool shows the selected file and connected destination. The creator can stop or select a different video before confirming.</p></div></li>
-          <li><div class="step-number">04</div><div><p class="eyebrow">Confirm upload</p><h3>Approve one specific draft transfer.</h3><p>The tool requires an explicit confirmation. Only then does the backend use <code>video.upload</code> to send the video to the authorized account as a draft.</p></div></li>
-          <li><div class="step-number">05</div><div><p class="eyebrow">Finish in TikTok</p><h3>Choose post settings and decide whether to publish.</h3><p>The creator opens the draft from TikTok's inbox or editor, reviews or adds the caption, chooses the available privacy and interaction settings, and makes the final publication decision there.</p></div></li>
+          <li><div class="step-number">04</div><div><p class="eyebrow">Configure</p><h3>Choose draft or Direct Post.</h3><p>For Direct Post, the tool loads the latest privacy, interaction, and duration settings from TikTok and keeps every option editable or explicitly selected by the creator.</p></div></li>
+          <li><div class="step-number">05</div><div><p class="eyebrow">Confirm &amp; track</p><h3>Approve one specific TikTok action.</h3><p>The tool sends nothing until explicit confirmation. It then shows the returned publishing reference and status; a draft is completed inside TikTok, while Direct Post uses the settings just confirmed.</p></div></li>
         </ol>
       </div>
     </section>
@@ -84,8 +84,8 @@
       <div class="wrap split feature-split">
         <div><p class="eyebrow">Creation technology</p><h2 id="technology-title">Music Short Factory is the workflow behind the tool.</h2></div>
         <div>
-          <p class="section-intro">Music Short Factory is the name of the broader editorial path covering research, scripts, assets, narration, captions, finished-video review, and TikTok draft delivery.</p>
-          <div class="notice"><strong>Focused by design.</strong> The current web tool does not create or edit the video. It provides only creator authorization, local preview, explicit confirmation, draft upload, and status checking. Final post settings and publication remain in TikTok.</div>
+          <p class="section-intro">Music Short Factory is the name of the broader editorial path covering research, scripts, assets, narration, captions, finished-video review, and TikTok delivery.</p>
+          <div class="notice"><strong>Focused by design.</strong> The current web tool does not create or edit the video. It provides creator authorization, local preview, a draft or Direct Post choice, explicit confirmation, transfer, and status checking.</div>
           <div class="section-action"><a class="button button-primary" href="app.html">Open creator tool <span aria-hidden="true">→</span></a></div>
         </div>
       </div>
@@ -98,15 +98,15 @@
           <li><strong>Research first</strong><span>Sources and context shape the story.</span></li>
           <li><strong>Visible preview</strong><span>The selected video is shown before any transfer is confirmed.</span></li>
           <li><strong>Rights awareness</strong><span>Creators remain responsible for permissions and appropriate media use.</span></li>
-          <li><strong>Creator control</strong><span>The creator confirms the upload, then completes post settings inside TikTok.</span></li>
+          <li><strong>Creator control</strong><span>The creator reviews the destination and settings, then explicitly confirms each action.</span></li>
         </ul>
       </div>
     </section>
 
     <section class="section integration-section" aria-labelledby="tiktok-title">
       <div class="wrap integration-card">
-        <div><p class="eyebrow">TikTok integration</p><h2 id="tiktok-title">Draft upload to an authorized account.</h2></div>
-        <div><p>The creator tool connects through TikTok Login Kit and uses only <code>user.info.basic</code> and <code>video.upload</code>. Tokens are handled by the secure backend, never exposed in the public frontend. A transfer starts only after the creator previews the selected video and explicitly confirms.</p><p>The result is a draft, not an automatic post. TikTok's own inbox or editor presents the caption, privacy, comments, and other settings available to that account before the creator chooses whether to publish.</p><div class="inline-links"><a href="app.html">Open the creator tool</a><a href="privacy.html">How data is handled</a><a href="data-deletion.html">Revocation and deletion</a></div></div>
+        <div><p class="eyebrow">TikTok integration</p><h2 id="tiktok-title">Draft or Direct Post to an authorized account.</h2></div>
+        <div><p>The creator tool connects through TikTok Login Kit and uses <code>user.info.basic</code>, <code>video.upload</code>, and <code>video.publish</code>. Tokens are handled by the secure backend, never exposed in the public frontend. A transfer starts only after the creator previews the selected video and explicitly confirms.</p><p>For Direct Post, the tool queries TikTok for the authorized account's current privacy, comments, Duet, Stitch, and duration restrictions. For draft upload, the creator completes the post inside TikTok.</p><div class="inline-links"><a href="app.html">Open the creator tool</a><a href="privacy.html">How data is handled</a><a href="data-deletion.html">Revocation and deletion</a></div></div>
       </div>
     </section>
 
@@ -117,7 +117,7 @@
 
   <footer class="site-footer">
     <div class="wrap footer-main">
-      <div class="footer-brand"><a class="brand" href="index.html" aria-label="Além do Hit home"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-copy"><strong>Além do Hit</strong><small>Music stories with context</small></span></a><p>A creator tool for short-form music stories. Music Short Factory is its preparation, review, and draft-delivery workflow.</p></div>
+      <div class="footer-brand"><a class="brand" href="index.html" aria-label="Além do Hit home"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-copy"><strong>Além do Hit</strong><small>Music stories with context</small></span></a><p>A creator tool for short-form music stories. Music Short Factory is its preparation, review, and publishing workflow.</p></div>
       <div class="footer-column"><strong>Explore</strong><a href="index.html">Home</a><a href="about.html" aria-current="page">About &amp; How It Works</a><a href="app.html">Creator tool</a><a href="support.html">Support</a></div>
       <div class="footer-column"><strong>Privacy</strong><a href="privacy.html">Privacy Policy</a><a href="data-deletion.html">Data Deletion</a><a href="mailto:alelseixas@gmail.com">Contact</a></div>
       <div class="footer-column"><strong>Legal</strong><a href="terms.html">Terms of Service</a><a href="privacy.html">Privacy Policy</a></div>
