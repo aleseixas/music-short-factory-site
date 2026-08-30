@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 export const REQUIRED_TIKTOK_SCOPES = Object.freeze([
   "user.info.basic",
   "video.upload",
+  "video.publish",
 ]);
 
 const MAX_TIKTOK_VIDEO_BYTES = 4 * 1024 * 1024 * 1024;
@@ -181,6 +182,7 @@ export function createConfig(env = process.env, cwd = process.cwd()) {
       max: MAX_TIKTOK_VIDEO_BYTES,
     }),
     trustProxy: boolean(env, "TRUST_PROXY", false),
+    directPostAudited: boolean(env, "TIKTOK_DIRECT_POST_AUDITED", false),
     scopes: REQUIRED_TIKTOK_SCOPES,
   });
 }

@@ -104,3 +104,14 @@ test("homepage exposes legal policies and sitemap contains every review page", a
     assert.match(sitemap, new RegExp(`/${page.replace(".", "\\.")}<\\/loc>`));
   }
 });
+
+test("creator page offers draft and Direct Post without hardcoded privacy options", async () => {
+  const app = await readFile(join(ROOT, "app.html"), "utf8");
+  const script = await readFile(join(ROOT, "app.js"), "utf8");
+  assert.match(app, /name="publish-mode" value="draft"/);
+  assert.match(app, /name="publish-mode" value="direct"/);
+  assert.match(app, /id="privacy-level"/);
+  assert.doesNotMatch(app, /<option[^>]+value="(?:SELF_ONLY|PUBLIC_TO_EVERYONE|MUTUAL_FOLLOW_FRIENDS|FOLLOWER_OF_CREATOR)"/);
+  assert.match(script, /requestJson\("\/api\/creator-info"/);
+  assert.match(app, /Music Usage Confirmation/);
+});

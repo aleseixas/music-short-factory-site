@@ -29,10 +29,16 @@ const PROJECT_ROOT = resolve(SOURCE_DIR, "..");
 const GITHUB_PAGES_BASE =
   "https://aleseixas.github.io/music-short-factory-site";
 const ACCESS_REFRESH_WINDOW_MS = 5 * 60 * 1000;
+const MAX_TIKTOK_CAPTION_LENGTH = 2200;
 const UNRESOLVED_TRANSFER_STATUSES = new Set([
   "UPLOADING",
   "TRANSFER_UNCONFIRMED",
   "PROCESSING_UPLOAD",
+]);
+const DIRECT_POST_LIMIT_CODES = new Set([
+  "spam_risk_too_many_posts",
+  "spam_risk_user_banned_from_posting",
+  "reached_active_user_cap",
 ]);
 const ROOT_FILE_ALLOWLIST = new Map([
   ["/", "index.html"],
@@ -119,6 +125,53 @@ function scalarQuery(value) {
 
 function publicError(status, code, message) {
   return new HttpError(status, code, message);
+}
+
+function hasScopes(scopes, requiredScopes) {
+  const granted = new Set(Array.isArray(scopes) ? scopes : []);
+  return requiredScopes.every((scope) => granted.has(scope));
+}
+
+function bodyString(body, name) {
+  const value = body?.[name];
+  return typeof value === "string" ? value : null;
+}
+
+function bodyBoolean(body, name) {
+  const value = bodyString(body, name);
+  if (value === "true") return true;
+  if (value === "false") return false;
+  throw publicError(400, "invalid_post_settings", "Invalid publishing settings.");
+}
+
+function directPostSettings(creatorInfo, audited) {
+  const returnedOptions = creatorInfo.privacyLevelOptions;
+  if (audited) {
+    return {
+      ...creatorInfo,
+      privacyLevelOptions: returnedOptions,
+      directPostAllowed: true,
+      unaudited: false,
+      restrictionReason: null,
+    };
+  }
+
+  const privateAccount =
+    returnedOptions.includes("FOLLOWER_OF_CREATOR") &&
+    !returnedOptions.includes("PUBLIC_TO_EVERYONE");
+  const supportsPrivateView = returnedOptions.includes("SELF_ONLY");
+  const directPostAllowed = privateAccount && supportsPrivateView;
+  return {
+    ...creatorInfo,
+    privacyLevelOptions: directPostAllowed
+      ? returnedOptions.filter((option) => option === "SELF_ONLY")
+      : [],
+    directPostAllowed,
+    unaudited: true,
+    restrictionReason: directPostAllowed
+      ? "This unaudited client can publish only to a private account with Only me visibility."
+      : "TikTok requires a private target account while this Direct Post client is unaudited.",
+  };
 }
 
 function errorResponse(res, status, code, message) {
@@ -289,10 +342,17 @@ export async function createApp({
     next();
   }
 
-  async function validAccessToken(sessionId) {
+  async function validAccessToken(sessionId, requiredScopes = []) {
     const connection = await store.getConnection(sessionId);
     if (!connection) {
       throw publicError(401, "tiktok_not_connected", "Connect a TikTok account first.");
+    }
+    if (!hasScopes(connection.scopes, requiredScopes)) {
+      throw publicError(
+        401,
+        "tiktok_reauthorization_required",
+        "Reconnect TikTok to authorize the required publishing permission.",
+      );
     }
     const currentTime = Date.now();
     if (connection.accessExpiresAt > currentTime + ACCESS_REFRESH_WINDOW_MS) {
@@ -311,7 +371,7 @@ export async function createApp({
     );
     if (
       refreshed.openId !== connection.openId ||
-      !hasRequiredScopes(refreshed.scopes)
+      !hasScopes(refreshed.scopes, requiredScopes)
     ) {
       throw publicError(
         401,
@@ -475,6 +535,30 @@ export async function createApp({
     }
   });
 
+  app.get(
+    "/api/creator-info",
+    requireSession,
+    requireConnection,
+    async (req, res, next) => {
+      try {
+        const accessToken = await validAccessToken(req.appSessionId, [
+          "video.publish",
+        ]);
+        const creatorInfo = await tiktokClient.queryCreatorInfo(accessToken);
+        res
+          .set("Cache-Control", "no-store")
+          .json({
+            creatorInfo: directPostSettings(
+              creatorInfo,
+              config.directPostAudited,
+            ),
+          });
+      } catch (error) {
+        next(error);
+      }
+    },
+  );
+
   app.post(
     "/api/upload",
     requireSession,
@@ -490,14 +574,130 @@ export async function createApp({
         if (!req.file) {
           throw publicError(400, "video_required", "Choose a video to upload.");
         }
+        const publishMode = bodyString(req.body, "publishMode") || "draft";
+        if (!new Set(["draft", "direct"]).has(publishMode)) {
+          throw publicError(400, "invalid_publish_mode", "Choose a publishing method.");
+        }
         if (req.body.consentConfirmed !== "true") {
           throw publicError(
             400,
             "confirmation_required",
-            "Confirm the draft upload before continuing.",
+            "Review the video and confirm this action before continuing.",
           );
         }
-        const accessToken = await validAccessToken(req.appSessionId);
+
+        const accessToken = await validAccessToken(req.appSessionId, [
+          publishMode === "direct" ? "video.publish" : "video.upload",
+        ]);
+        let initializeTransfer = null;
+
+        if (publishMode === "direct") {
+          const latestCreatorInfo = directPostSettings(
+            await tiktokClient.queryCreatorInfo(accessToken),
+            config.directPostAudited,
+          );
+          if (!latestCreatorInfo.directPostAllowed) {
+            throw publicError(
+              403,
+              "direct_post_unavailable",
+              latestCreatorInfo.restrictionReason,
+            );
+          }
+
+          const title = bodyString(req.body, "caption");
+          if (title === null || title.length > MAX_TIKTOK_CAPTION_LENGTH) {
+            throw publicError(
+              400,
+              "invalid_caption",
+              `The caption must be ${MAX_TIKTOK_CAPTION_LENGTH} characters or fewer.`,
+            );
+          }
+          const privacyLevel = bodyString(req.body, "privacyLevel");
+          if (!latestCreatorInfo.privacyLevelOptions.includes(privacyLevel)) {
+            throw publicError(
+              400,
+              "privacy_option_unavailable",
+              "Select a privacy option currently available for this TikTok account.",
+            );
+          }
+
+          const durationSeconds = Number(
+            bodyString(req.body, "videoDurationSeconds"),
+          );
+          if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) {
+            throw publicError(
+              400,
+              "video_duration_required",
+              "Wait for the video duration to load before publishing.",
+            );
+          }
+          if (durationSeconds > latestCreatorInfo.maxVideoPostDurationSec) {
+            throw publicError(
+              400,
+              "video_too_long",
+              `This TikTok account accepts videos up to ${latestCreatorInfo.maxVideoPostDurationSec} seconds.`,
+            );
+          }
+
+          const allowComment = bodyBoolean(req.body, "allowComment");
+          const allowDuet = bodyBoolean(req.body, "allowDuet");
+          const allowStitch = bodyBoolean(req.body, "allowStitch");
+          if (
+            (allowComment && latestCreatorInfo.commentDisabled) ||
+            (allowDuet && latestCreatorInfo.duetDisabled) ||
+            (allowStitch && latestCreatorInfo.stitchDisabled)
+          ) {
+            throw publicError(
+              400,
+              "interaction_unavailable",
+              "One selected interaction is no longer available for this account.",
+            );
+          }
+
+          const commercialContent = bodyBoolean(
+            req.body,
+            "commercialContent",
+          );
+          const brandOrganicToggle = bodyBoolean(req.body, "brandOrganic");
+          const brandContentToggle = bodyBoolean(req.body, "brandContent");
+          if (
+            (!commercialContent &&
+              (brandOrganicToggle || brandContentToggle)) ||
+            (commercialContent &&
+              !brandOrganicToggle &&
+              !brandContentToggle)
+          ) {
+            throw publicError(
+              400,
+              "commercial_disclosure_required",
+              "Complete the commercial content disclosure before publishing.",
+            );
+          }
+          if (brandContentToggle && privacyLevel === "SELF_ONLY") {
+            throw publicError(
+              400,
+              "branded_content_privacy_conflict",
+              "Branded content cannot use Only me visibility.",
+            );
+          }
+
+          initializeTransfer = (transfer) =>
+            tiktokClient.initializeDirectPost({
+              ...transfer,
+              postInfo: {
+                title,
+                privacyLevel,
+                disableComment:
+                  latestCreatorInfo.commentDisabled || !allowComment,
+                disableDuet: latestCreatorInfo.duetDisabled || !allowDuet,
+                disableStitch:
+                  latestCreatorInfo.stitchDisabled || !allowStitch,
+                brandContentToggle,
+                brandOrganicToggle,
+              },
+            });
+        }
+
         const result = await uploadVideoFile({
           filePath: req.file.path,
           videoSize: req.file.size,
@@ -505,11 +705,13 @@ export async function createApp({
           accessToken,
           tiktokClient,
           fetchImpl,
+          initializeTransfer,
           onInitialized: async ({ publishId }) => {
             publish = await store.recordPublish(
               req.appSessionId,
               publishId,
               "UPLOADING",
+              publishMode,
             );
           },
         });
@@ -741,6 +943,42 @@ export async function createApp({
     }
 
     if (error instanceof TikTokApiError) {
+      if (error.code === "scope_not_authorized") {
+        errorResponse(
+          res,
+          401,
+          "tiktok_reauthorization_required",
+          "Reconnect TikTok to authorize Direct Post.",
+        );
+        return;
+      }
+      if (DIRECT_POST_LIMIT_CODES.has(error.code)) {
+        errorResponse(
+          res,
+          403,
+          "direct_post_temporarily_unavailable",
+          "TikTok is not accepting another Direct Post for this account right now. Try again later.",
+        );
+        return;
+      }
+      if (error.code === "unaudited_client_can_only_post_to_private_accounts") {
+        errorResponse(
+          res,
+          403,
+          "private_account_required",
+          "TikTok requires a private account while this Direct Post client is unaudited.",
+        );
+        return;
+      }
+      if (error.code === "privacy_level_option_mismatch") {
+        errorResponse(
+          res,
+          400,
+          "privacy_option_unavailable",
+          "TikTok changed the available privacy options. Review them and try again.",
+        );
+        return;
+      }
       const status = error.status === 401 ? 401 : error.status === 429 ? 429 : 502;
       errorResponse(
         res,

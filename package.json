@@ -2,7 +2,7 @@
   "name": "alem-do-hit-music-short-factory",
   "version": "1.0.0",
   "private": true,
-  "description": "Minimal web application for the Além do Hit Music Short Factory TikTok draft upload workflow.",
+  "description": "Minimal web application for Além do Hit TikTok draft uploads and Direct Post.",
   "type": "module",
   "engines": {
     "node": ">=22.13.0"

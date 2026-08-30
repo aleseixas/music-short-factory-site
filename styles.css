@@ -1497,6 +1497,64 @@ div.account-avatar {
   font-size: 0.75rem;
 }
 
+.publish-mode {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 18px;
+  padding: 0;
+  border: 0;
+}
+
+.publish-mode legend,
+.setting-group legend {
+  grid-column: 1 / -1;
+  margin-bottom: 8px;
+  color: var(--subtle);
+  font-size: 0.7rem;
+  font-weight: 750;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.publish-mode > label {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-small);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.publish-mode > label:has(input:checked) {
+  border-color: rgba(217, 255, 87, 0.42);
+  background: rgba(217, 255, 87, 0.045);
+}
+
+.publish-mode input,
+.setting-group input {
+  width: 17px;
+  height: 17px;
+  margin: 2px 0 0;
+  accent-color: var(--lime);
+}
+
+.publish-mode label span,
+.commercial-options label > span {
+  display: grid;
+  gap: 3px;
+}
+
+.publish-mode small,
+.setting-group small,
+.form-field small,
+.creator-info-card small {
+  color: var(--subtle);
+  font-size: 0.75rem;
+}
+
 .video-preview {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(190px, 0.5fr);
@@ -1533,6 +1591,114 @@ div.account-avatar {
 
 .video-meta strong {
   overflow-wrap: anywhere;
+  font-size: 0.86rem;
+}
+
+.direct-settings {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 8px;
+}
+
+.creator-info-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px;
+  border: 1px solid rgba(217, 255, 87, 0.3);
+  border-radius: var(--radius-small);
+  background: rgba(217, 255, 87, 0.035);
+}
+
+.creator-info-card div,
+.form-field {
+  display: grid;
+  gap: 7px;
+}
+
+.creator-info-card span,
+.form-field > span {
+  color: var(--subtle);
+  font-size: 0.7rem;
+  font-weight: 750;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.form-field textarea,
+.form-field select {
+  width: 100%;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-small);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.form-field textarea {
+  min-height: 112px;
+  padding: 13px 14px;
+  resize: vertical;
+}
+
+.form-field select {
+  min-height: 48px;
+  padding: 0 14px;
+}
+
+.form-field textarea:focus,
+.form-field select:focus {
+  border-color: rgba(217, 255, 87, 0.56);
+  outline: 2px solid rgba(217, 255, 87, 0.12);
+}
+
+.form-field select:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.setting-group {
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-small);
+  background: rgba(255, 255, 255, 0.012);
+}
+
+.setting-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 22px;
+  margin-bottom: 9px;
+}
+
+.setting-options label,
+.setting-toggle,
+.commercial-options label {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 9px;
+  align-items: start;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.setting-options label:has(input:disabled),
+.commercial-options label.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.commercial-options {
+  display: grid;
+  gap: 12px;
+  margin: 15px 0 10px 29px;
+}
+
+.direct-restriction {
+  margin-bottom: 0;
+  color: var(--muted);
   font-size: 0.86rem;
 }
 
@@ -1886,8 +2052,14 @@ div.account-avatar {
   }
 
   .app-progress ol,
-  .video-preview {
+  .video-preview,
+  .publish-mode {
     grid-template-columns: 1fr;
+  }
+
+  .creator-info-card {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .app-progress li {

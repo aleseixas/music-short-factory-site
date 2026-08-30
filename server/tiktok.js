@@ -6,6 +6,10 @@ const REVOKE_ENDPOINT = "https://open.tiktokapis.com/v2/oauth/revoke/";
 const USER_INFO_ENDPOINT = "https://open.tiktokapis.com/v2/user/info/";
 const UPLOAD_INIT_ENDPOINT =
   "https://open.tiktokapis.com/v2/post/publish/inbox/video/init/";
+const CREATOR_INFO_ENDPOINT =
+  "https://open.tiktokapis.com/v2/post/publish/creator_info/query/";
+const DIRECT_POST_INIT_ENDPOINT =
+  "https://open.tiktokapis.com/v2/post/publish/video/init/";
 const STATUS_ENDPOINT =
   "https://open.tiktokapis.com/v2/post/publish/status/fetch/";
 
@@ -258,6 +262,91 @@ export function createTikTokClient({
     return { publishId: data.publish_id, uploadUrl: data.upload_url };
   }
 
+  async function queryCreatorInfo(accessToken) {
+    const { payload, status } = await request(CREATOR_INFO_ENDPOINT, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json; charset=UTF-8",
+      },
+    });
+    const data = assertApiPayload(payload, status);
+    if (
+      typeof data.creator_username !== "string" ||
+      typeof data.creator_nickname !== "string" ||
+      !data.creator_nickname ||
+      !Array.isArray(data.privacy_level_options) ||
+      data.privacy_level_options.length === 0 ||
+      data.privacy_level_options.some(
+        (option) => typeof option !== "string" || !option,
+      ) ||
+      typeof data.comment_disabled !== "boolean" ||
+      typeof data.duet_disabled !== "boolean" ||
+      typeof data.stitch_disabled !== "boolean" ||
+      !Number.isSafeInteger(data.max_video_post_duration_sec) ||
+      data.max_video_post_duration_sec <= 0
+    ) {
+      throw new TikTokApiError("invalid_creator_info_response", 502);
+    }
+    return {
+      avatarUrl:
+        typeof data.creator_avatar_url === "string" &&
+        data.creator_avatar_url
+          ? data.creator_avatar_url
+          : null,
+      username: data.creator_username,
+      nickname: data.creator_nickname,
+      privacyLevelOptions: [...new Set(data.privacy_level_options)],
+      commentDisabled: data.comment_disabled,
+      duetDisabled: data.duet_disabled,
+      stitchDisabled: data.stitch_disabled,
+      maxVideoPostDurationSec: data.max_video_post_duration_sec,
+    };
+  }
+
+  async function initializeDirectPost({
+    accessToken,
+    videoSize,
+    chunkSize,
+    totalChunkCount,
+    postInfo,
+  }) {
+    const { payload, status } = await request(DIRECT_POST_INIT_ENDPOINT, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json; charset=UTF-8",
+      },
+      body: JSON.stringify({
+        post_info: {
+          title: postInfo.title,
+          privacy_level: postInfo.privacyLevel,
+          disable_duet: postInfo.disableDuet,
+          disable_comment: postInfo.disableComment,
+          disable_stitch: postInfo.disableStitch,
+          brand_content_toggle: postInfo.brandContentToggle,
+          brand_organic_toggle: postInfo.brandOrganicToggle,
+        },
+        source_info: {
+          source: "FILE_UPLOAD",
+          video_size: videoSize,
+          chunk_size: chunkSize,
+          total_chunk_count: totalChunkCount,
+        },
+      }),
+    });
+    const data = assertApiPayload(payload, status);
+    if (
+      typeof data.publish_id !== "string" ||
+      !data.publish_id ||
+      typeof data.upload_url !== "string" ||
+      !data.upload_url
+    ) {
+      throw new TikTokApiError("invalid_direct_post_init_response", 502);
+    }
+    return { publishId: data.publish_id, uploadUrl: data.upload_url };
+  }
+
   async function fetchPublishStatus({ accessToken, publishId }) {
     const { payload, status } = await request(STATUS_ENDPOINT, {
       method: "POST",
@@ -289,6 +378,8 @@ export function createTikTokClient({
     revokeAccess,
     getUserInfo,
     initializeUpload,
+    queryCreatorInfo,
+    initializeDirectPost,
     fetchPublishStatus,
   });
 }

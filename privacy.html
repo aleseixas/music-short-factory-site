@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Privacy Policy | Além do Hit</title>
-  <meta name="description" content="How Além do Hit handles creator content, TikTok authorization, essential sessions, draft uploads, support information, and deletion requests.">
+  <meta name="description" content="How Além do Hit handles creator content, TikTok authorization, draft uploads, Direct Post, support information, and deletion requests.">
   <meta name="theme-color" content="#090b0b">
   <link rel="canonical" href="https://aleseixas.github.io/music-short-factory-site/privacy.html">
   <meta property="og:type" content="website">
@@ -35,8 +35,8 @@
       <div class="wrap page-hero-inner">
         <p class="eyebrow">Privacy</p>
         <h1 id="privacy-title">Privacy Policy</h1>
-        <p class="lead">This Policy explains what information Além do Hit processes through its public pages, the Music Short Factory creator tool, support communications, and the authorized TikTok draft-upload integration.</p>
-        <div class="page-meta" role="group" aria-label="Document dates"><span>Effective August 28, 2026</span><span>Last updated August 29, 2026</span></div>
+        <p class="lead">This Policy explains what information Além do Hit processes through its public pages, the Music Short Factory creator tool, support communications, and its authorized TikTok publishing integration.</p>
+        <div class="page-meta" role="group" aria-label="Document dates"><span>Effective August 28, 2026</span><span>Last updated August 30, 2026</span></div>
       </div>
     </section>
 
@@ -51,7 +51,7 @@
           <div class="notice"><strong>At a glance.</strong> Além do Hit uses data only to operate the creator-requested workflow described below. TikTok tokens are encrypted on the server, uploaded videos are temporary, and no video is transferred without explicit confirmation. Personal information and TikTok user data are not sold.</div>
 
           <h2 id="scope">1. Scope</h2>
-          <p>This Privacy Policy applies to the Além do Hit public pages, support communications, the Music Short Factory web workflow, its minimum secure backend, and the TikTok connection operated for the creator tool. Além do Hit is the primary public brand; Music Short Factory is the creation and draft-delivery workflow.</p>
+          <p>This Privacy Policy applies to the Além do Hit public pages, support communications, the Music Short Factory web workflow, its minimum secure backend, and the TikTok connection operated for the creator tool. Além do Hit is the primary public brand; Music Short Factory is the creation and publishing workflow.</p>
           <p>Third-party services, including TikTok and the providers used to host the public pages and backend, process information under their own terms and privacy policies.</p>
 
           <h2 id="data">2. Information we process</h2>
@@ -59,10 +59,10 @@
           <div class="table-wrap"><table><thead><tr><th scope="col">Category</th><th scope="col">Examples</th></tr></thead><tbody>
             <tr><td><strong>Support information</strong></td><td>Your email address and the information you include in a support, privacy, or deletion request.</td></tr>
             <tr><td><strong>Essential session information</strong></td><td>An opaque session identifier stored in a secure cookie, anti-forgery data, session timestamps, and connection state. The cookie does not contain a TikTok access token.</td></tr>
-            <tr><td><strong>Creator materials</strong></td><td>The video file a creator deliberately selects for preview and draft upload, plus basic file information needed to validate and transfer it.</td></tr>
-            <tr><td><strong>Authorized TikTok account information</strong></td><td>TikTok account identifiers and limited basic profile information returned under <code>user.info.basic</code> for the account the creator authorizes.</td></tr>
+            <tr><td><strong>Creator materials</strong></td><td>The video file a creator deliberately selects for preview and transfer, plus its caption and basic file information needed to validate and send it.</td></tr>
+            <tr><td><strong>Authorized TikTok account information</strong></td><td>TikTok account identifiers and limited basic profile information returned under <code>user.info.basic</code>, plus creator-specific publishing options and restrictions returned by TikTok before Direct Post.</td></tr>
             <tr><td><strong>Authorization information</strong></td><td>OAuth access and refresh tokens, granted scopes, expiration, and connection state. Tokens are encrypted on the server using authenticated encryption.</td></tr>
-            <tr><td><strong>Draft upload information</strong></td><td>The video selected by the creator, TikTok upload identifier, upload status, and timestamps associated with the transfer.</td></tr>
+            <tr><td><strong>Publishing information</strong></td><td>The selected publishing mode, video, caption, privacy level, permitted comments, Duet and Stitch choices, required content disclosures, TikTok publishing identifier, status, and transfer timestamps.</td></tr>
             <tr><td><strong>Operational information</strong></td><td>Application events, non-sensitive diagnostic messages, request metadata, security events, and technical logs needed to operate and troubleshoot the service.</td></tr>
           </tbody></table></div>
           <p>Do not send passwords, authorization codes, tokens, client secrets, or other unnecessary credentials in a support message.</p>
@@ -73,17 +73,17 @@
             <li>provide and protect the creator's essential session;</li>
             <li>support a browser-local preview and, only after explicit confirmation, receive, validate, and temporarily stage the video selected by the creator;</li>
             <li>identify and authenticate a platform account authorized by the creator;</li>
-            <li>carry out a TikTok draft upload requested and explicitly confirmed by the creator;</li>
-            <li>display the authorized account and check draft-upload status;</li>
+            <li>carry out a TikTok draft upload or Direct Post requested and explicitly confirmed by the creator;</li>
+            <li>display the authorized account, load account-specific publishing options and restrictions from TikTok, and check publishing status;</li>
             <li>provide support and respond to privacy or deletion requests;</li>
             <li>maintain security, diagnose errors, prevent misuse, and improve reliability; and</li>
             <li>comply with applicable legal obligations and enforce the <a href="terms.html">Terms of Service</a>.</li>
           </ul>
 
           <h2 id="tiktok">4. TikTok integration</h2>
-          <p>The creator tool uses TikTok Login Kit to connect an account chosen by the creator. It requests only <code>user.info.basic</code>, which identifies and displays the authorized account, and <code>video.upload</code>, which allows a creator-confirmed video to be transferred as a draft.</p>
-          <p>Before a transfer, the tool shows the authorized account and a preview of the selected video and requires explicit consent. The backend then sends the file to that account as a draft and checks the processing status. Além do Hit does not request <code>video.publish</code>, does not Direct Post, and does not automatically publish content.</p>
-          <p>The creator completes the caption, privacy, comments, and any other settings made available by TikTok inside TikTok's own inbox or editor, where the creator makes the final publication decision.</p>
+          <p>The creator tool uses TikTok Login Kit to connect an account chosen by the creator. It requests <code>user.info.basic</code> to identify and display that account, <code>video.upload</code> to send a creator-confirmed video as a draft, and <code>video.publish</code> to load creator-specific publishing options and perform a creator-confirmed Direct Post.</p>
+          <p>For Direct Post, the backend queries TikTok's creator information before publishing. The tool shows only the privacy options and comments, Duet, Stitch, duration, and other restrictions TikTok returns for the authorized account. The creator previews the video, edits the caption, chooses from those available settings, completes any required content and music disclosures, and explicitly confirms before the video is sent.</p>
+          <p>For a draft upload, the creator completes the caption and final settings inside TikTok. For Direct Post, the creator makes that decision in the tool immediately before selecting <strong>Publish directly</strong>. Além do Hit does not send a draft or publish directly without the creator's action and confirmation.</p>
           <p>TikTok client credentials and OAuth tokens are never placed in the public frontend. Access and refresh tokens are encrypted at rest on the backend.</p>
 
           <h2 id="cookies">5. Essential cookie</h2>
@@ -93,14 +93,14 @@
           <h2 id="sharing">6. When information may be shared</h2>
           <p>Information may be shared only when reasonably necessary with:</p>
           <ul>
-            <li><strong>TikTok.</strong> TikTok receives the creator-confirmed video, authorization information, and transfer details required to create the draft and report its status.</li>
+            <li><strong>TikTok.</strong> TikTok receives the creator-confirmed video, authorization information, selected publishing settings, required disclosures, and transfer details needed to create a draft or Direct Post and report its status.</li>
             <li><strong>Necessary providers.</strong> Limited information may be handled by providers supplying HTTPS hosting, temporary media transfer, storage, security, or diagnostic infrastructure.</li>
             <li><strong>Legal and safety recipients.</strong> Information may be preserved or disclosed when required by applicable law, valid legal process, security needs, or the protection of rights and safety.</li>
           </ul>
           <p><strong>Além do Hit does not sell personal information or TikTok user data and does not share it for behavioral advertising.</strong></p>
 
           <h2 id="retention">7. Retention</h2>
-          <p>Information is kept only for as long as reasonably necessary to maintain the creator's authorized connection, complete a confirmed draft transfer, check status, secure the operation, respond to support, or meet a legal obligation.</p>
+          <p>Information is kept only for as long as reasonably necessary to maintain the creator's authorized connection, complete a confirmed draft or Direct Post transfer, check status, secure the operation, respond to support, or meet a legal obligation.</p>
           <p>The selected video is stored only in a temporary upload location and is normally deleted immediately after the transfer attempt completes or fails. If a process interruption leaves a temporary file behind, startup and scheduled cleanup remove recognized upload files after they are more than six hours old. Videos are not kept as a media library.</p>
           <p>Essential sessions are configured for no more than 30 days and use a seven-day default. Expired sessions and their associated records are deleted when cleanup runs. Disconnecting removes the encrypted authorization credentials and upload-status records while leaving an anonymous essential session; <strong>Delete my data</strong> removes the session and other associated application records. A verified deletion request provides another route, subject only to limited records that may need to be retained for security or legal reasons.</p>
 
@@ -133,7 +133,7 @@
 
   <footer class="site-footer">
     <div class="wrap footer-main">
-      <div class="footer-brand"><a class="brand" href="index.html" aria-label="Além do Hit home"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-copy"><strong>Além do Hit</strong><small>Music stories with context</small></span></a><p>A creator tool for short-form music stories. Music Short Factory is its preparation, review, and draft-delivery workflow.</p></div>
+      <div class="footer-brand"><a class="brand" href="index.html" aria-label="Além do Hit home"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-copy"><strong>Além do Hit</strong><small>Music stories with context</small></span></a><p>A creator tool for short-form music stories. Music Short Factory is its preparation, review, and publishing workflow.</p></div>
       <div class="footer-column"><strong>Explore</strong><a href="index.html">Home</a><a href="about.html">About &amp; How It Works</a><a href="app.html">Creator tool</a><a href="support.html">Support</a></div>
       <div class="footer-column"><strong>Privacy</strong><a href="privacy.html" aria-current="page">Privacy Policy</a><a href="data-deletion.html">Data Deletion</a><a href="mailto:alelseixas@gmail.com">Contact</a></div>
       <div class="footer-column"><strong>Legal</strong><a href="terms.html">Terms of Service</a><a href="privacy.html" aria-current="page">Privacy Policy</a></div>

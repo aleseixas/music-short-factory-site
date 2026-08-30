@@ -106,6 +106,7 @@ export function serializePublish(row) {
   if (!row) return null;
   return {
     publishId: row.publish_id,
+    mode: row.publish_mode === "direct" ? "direct" : "draft",
     status: row.status,
     uploadedBytes: storedInteger(row.uploaded_bytes ?? 0, "uploaded_bytes"),
     failReason: row.fail_reason || null,
@@ -158,6 +159,7 @@ export function createStore({
       session_hash TEXT NOT NULL
         REFERENCES sessions(session_hash) ON DELETE CASCADE ON UPDATE CASCADE,
       status TEXT NOT NULL,
+      publish_mode TEXT NOT NULL DEFAULT 'draft',
       uploaded_bytes INTEGER NOT NULL DEFAULT 0,
       fail_reason TEXT,
       created_at INTEGER NOT NULL,
@@ -167,6 +169,13 @@ export function createStore({
     CREATE INDEX IF NOT EXISTS publishes_session_updated
       ON publishes(session_hash, updated_at DESC);
   `);
+
+  const publishColumns = db.prepare("PRAGMA table_info(publishes)").all();
+  if (!publishColumns.some((column) => column.name === "publish_mode")) {
+    db.exec(
+      "ALTER TABLE publishes ADD COLUMN publish_mode TEXT NOT NULL DEFAULT 'draft';",
+    );
+  }
 
   const statements = {
     ping: db.prepare("SELECT 1 AS value"),
@@ -247,8 +256,9 @@ export function createStore({
     `),
     insertPublish: db.prepare(`
       INSERT INTO publishes
-        (publish_id, session_hash, status, uploaded_bytes, created_at, updated_at)
-      VALUES (?, ?, ?, 0, ?, ?)
+        (publish_id, session_hash, status, publish_mode, uploaded_bytes,
+         created_at, updated_at)
+      VALUES (?, ?, ?, ?, 0, ?, ?)
     `),
     getPublish: db.prepare(`
       SELECT * FROM publishes WHERE publish_id = ? AND session_hash = ?
@@ -444,7 +454,12 @@ export function createStore({
     return statements.deleteUserSessions.run(connection.open_id).changes > 0;
   }
 
-  function recordPublish(sessionId, publishId, status = "PROCESSING_UPLOAD") {
+  function recordPublish(
+    sessionId,
+    publishId,
+    status = "PROCESSING_UPLOAD",
+    mode = "draft",
+  ) {
     const key = sessionHash(sessionId);
     if (!key) throw new Error("Session not found");
     const currentTime = now();
@@ -452,6 +467,7 @@ export function createStore({
       publishId,
       key,
       status,
+      mode === "direct" ? "direct" : "draft",
       currentTime,
       currentTime,
     );

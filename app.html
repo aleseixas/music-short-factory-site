@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Creator App | Além do Hit</title>
-  <meta name="description" content="Connect your TikTok account, preview your video, and send it to your own TikTok drafts with the Music Short Factory creator workflow.">
+  <meta name="description" content="Connect your TikTok account, preview your video, and choose a draft upload or an explicitly confirmed Direct Post.">
   <meta name="theme-color" content="#090b0b">
   <link rel="canonical" href="https://aleseixas.github.io/music-short-factory-site/app.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Além do Hit">
   <meta property="og:title" content="Creator App | Além do Hit">
-  <meta property="og:description" content="Preview a video and send it to your own authorized TikTok drafts.">
+  <meta property="og:description" content="Preview a video and send it to your authorized TikTok account as a draft or Direct Post.">
   <meta property="og:url" content="https://aleseixas.github.io/music-short-factory-site/app.html">
   <meta property="og:image" content="https://aleseixas.github.io/music-short-factory-site/assets/alem-do-hit-og.png">
   <meta property="og:image:width" content="1200">
@@ -35,8 +35,8 @@
     <section class="page-hero app-hero" aria-labelledby="app-title">
       <div class="wrap page-hero-inner">
         <p class="eyebrow">Music Short Factory</p>
-        <h1 id="app-title">Send your video to your own TikTok drafts.</h1>
-        <p class="lead">Connect an account you control, preview a local video, confirm the transfer, and finish the caption and publishing choices inside TikTok.</p>
+        <h1 id="app-title">Send your video to your authorized TikTok account.</h1>
+        <p class="lead">Connect an account you control, preview a local video, then choose a TikTok draft or configure and explicitly confirm a Direct Post.</p>
         <nav class="page-meta" aria-label="Creator app information"><a href="about.html#workflow">How it works</a><a href="privacy.html">Privacy Policy</a><a href="data-deletion.html">Disconnect &amp; delete data</a></nav>
       </div>
     </section>
@@ -47,13 +47,13 @@
         <div class="app-alert" id="runtime-alert" role="status" hidden></div>
 
         <div class="app-layout">
-          <aside class="app-progress" aria-label="Draft upload steps">
-            <p class="eyebrow">Draft workflow</p>
+          <aside class="app-progress" aria-label="TikTok publishing steps">
+            <p class="eyebrow" id="workflow-label">Publishing workflow</p>
             <ol>
               <li data-progress-step="connect"><span>01</span><div><strong>Connect</strong><small>Authorize your TikTok account</small></div></li>
               <li data-progress-step="preview"><span>02</span><div><strong>Preview</strong><small>Choose and review your video</small></div></li>
-              <li data-progress-step="confirm"><span>03</span><div><strong>Confirm</strong><small>Approve the draft transfer</small></div></li>
-              <li data-progress-step="complete"><span>04</span><div><strong>Continue in TikTok</strong><small>Edit settings and publish</small></div></li>
+              <li data-progress-step="confirm"><span>03</span><div><strong>Configure &amp; confirm</strong><small>Review every publishing choice</small></div></li>
+              <li data-progress-step="complete"><span>04</span><div><strong>Track status</strong><small>Follow TikTok processing</small></div></li>
             </ol>
           </aside>
 
@@ -68,7 +68,7 @@
 
               <div id="disconnected-view">
                 <div class="app-panel-action">
-                  <p>Only the account that completes TikTok authorization can receive the draft.</p>
+                  <p>Only the account that completes TikTok authorization can receive a draft or Direct Post.</p>
                   <a class="button button-primary" id="connect-link" href="/auth/tiktok">Connect with TikTok <span aria-hidden="true">→</span></a>
                 </div>
               </div>
@@ -86,6 +86,12 @@
             <section class="app-panel" aria-labelledby="video-title">
               <div class="app-panel-heading"><span class="panel-number">02</span><div><h3 id="video-title">Choose and preview your video</h3><p>The preview stays in your browser. The backend receives the file only after your explicit confirmation.</p></div></div>
 
+              <fieldset class="publish-mode" id="publish-mode">
+                <legend>Publishing method</legend>
+                <label><input type="radio" name="publish-mode" value="draft" checked><span><strong>Send as draft</strong><small>Finish the publishing flow inside TikTok.</small></span></label>
+                <label><input type="radio" name="publish-mode" value="direct"><span><strong>Publish directly</strong><small>Choose current TikTok settings here before posting.</small></span></label>
+              </fieldset>
+
               <label class="file-picker" for="video-file" id="file-picker">
                 <input id="video-file" name="video" type="file" accept="video/mp4,video/quicktime,video/webm" disabled>
                 <span class="file-picker-icon" aria-hidden="true">+</span>
@@ -100,14 +106,61 @@
             </section>
 
             <section class="app-panel" aria-labelledby="confirm-title">
-              <div class="app-panel-heading"><span class="panel-number">03</span><div><h3 id="confirm-title">Confirm the draft transfer</h3><p>This action uploads the selected video to the authorized account's TikTok inbox. It does not publish automatically.</p></div></div>
+              <div class="app-panel-heading"><span class="panel-number">03</span><div><h3 id="confirm-title">Confirm the draft transfer</h3><p id="confirm-description">This action uploads the selected video to the authorized account's TikTok inbox. It does not publish automatically.</p></div></div>
 
-              <div class="draft-explainer">
+              <div class="draft-explainer" id="draft-explainer">
                 <strong>What happens next</strong>
                 <p>TikTok will notify you when the draft is ready. Open that notification to edit the caption, choose privacy and interaction settings, and decide whether to publish.</p>
               </div>
 
-              <label class="consent-check" for="upload-consent"><input id="upload-consent" type="checkbox" disabled><span>I reviewed this video and explicitly want to send it to my authorized TikTok account as a draft.</span></label>
+              <div class="direct-settings" id="direct-settings" hidden>
+                <div class="creator-info-card" id="creator-info-card" aria-live="polite">
+                  <div><span>Direct Post account</span><strong id="direct-account-name">Loading TikTok creator settings...</strong></div>
+                  <small id="direct-account-limit"></small>
+                </div>
+
+                <label class="form-field" for="post-caption">
+                  <span>Caption</span>
+                  <textarea id="post-caption" maxlength="2200" rows="4" placeholder="Write a caption and edit any hashtags or mentions."></textarea>
+                  <small><span id="caption-count">0</span>/2200 characters</small>
+                </label>
+
+                <label class="form-field" for="privacy-level">
+                  <span>Privacy</span>
+                  <select id="privacy-level" disabled>
+                    <option value="" selected>Select privacy</option>
+                  </select>
+                  <small id="privacy-help">Options are loaded from TikTok for the connected account.</small>
+                </label>
+
+                <fieldset class="setting-group" id="interaction-settings">
+                  <legend>Allow interactions</legend>
+                  <div class="setting-options">
+                    <label><input id="allow-comment" type="checkbox" disabled><span>Comments</span></label>
+                    <label><input id="allow-duet" type="checkbox" disabled><span>Duet</span></label>
+                    <label><input id="allow-stitch" type="checkbox" disabled><span>Stitch</span></label>
+                  </div>
+                  <small>Each option starts off and is disabled when TikTok does not allow it for this account.</small>
+                </fieldset>
+
+                <fieldset class="setting-group commercial-settings">
+                  <legend>Content disclosure</legend>
+                  <label class="setting-toggle"><input id="commercial-content" type="checkbox"><span>This content promotes a brand, product, service, or my own business.</span></label>
+                  <div class="commercial-options" id="commercial-options" hidden>
+                    <label><input id="brand-organic" type="checkbox"><span><strong>Your brand</strong><small>Promotes you or your own business. Labeled Promotional content.</small></span></label>
+                    <label id="brand-content-label"><input id="brand-content" type="checkbox"><span><strong>Branded content</strong><small>Promotes a third party. Labeled Paid partnership.</small></span></label>
+                  </div>
+                  <small id="commercial-help">Disclosure is off by default.</small>
+                </fieldset>
+
+                <div class="draft-explainer direct-restriction" id="direct-restriction" hidden></div>
+              </div>
+
+              <label class="consent-check" for="upload-consent">
+                <input id="upload-consent" type="checkbox" disabled>
+                <span id="draft-consent">I reviewed this video and explicitly want to send it to my authorized TikTok account as a draft.</span>
+                <span id="direct-consent" hidden>I reviewed this video and explicitly want to publish it to the TikTok account shown above. <span id="music-consent">By posting, I agree to TikTok's <a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank" rel="noopener noreferrer">Music Usage Confirmation</a>.</span><span id="brand-policy-consent" hidden>By posting, I agree to TikTok's <a href="https://www.tiktok.com/legal/page/global/bc-policy/en" target="_blank" rel="noopener noreferrer">Branded Content Policy</a> and <a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank" rel="noopener noreferrer">Music Usage Confirmation</a>.</span></span>
+              </label>
 
               <div class="upload-actions"><button class="button button-primary" id="upload-button" type="button" disabled>Send to TikTok drafts <span aria-hidden="true">→</span></button><span class="upload-helper">Nothing is sent until you press this button.</span></div>
 
@@ -120,7 +173,7 @@
             <section class="app-panel" id="status-panel" aria-labelledby="status-title" hidden>
               <div class="app-panel-heading"><span class="panel-number">04</span><div><h3 id="status-title">TikTok transfer status</h3><p id="status-description" aria-live="polite">Waiting for an update.</p></div></div>
               <div class="status-card"><span class="status-dot" id="status-dot" aria-hidden="true"></span><div><span>Current status</span><strong id="status-value">—</strong><small id="publish-id"></small></div><button class="text-button" id="refresh-status-button" type="button">Refresh status</button></div>
-              <div class="next-step" id="next-step" hidden><strong>Continue in the TikTok app</strong><p>Open the notification in your TikTok inbox. Review the draft, choose the settings TikTok makes available to your account, and publish only if you are ready.</p></div>
+              <div class="next-step" id="next-step" hidden><strong id="next-step-title">Continue in the TikTok app</strong><p id="next-step-description">Open the notification in your TikTok inbox. Review the draft, choose the settings TikTok makes available to your account, and publish only if you are ready.</p></div>
             </section>
           </div>
         </div>
@@ -129,8 +182,8 @@
 
     <section class="section" aria-labelledby="boundary-title">
       <div class="wrap split">
-        <div><p class="eyebrow">Clear boundaries</p><h2 id="boundary-title">Draft upload is not Direct Post.</h2></div>
-        <div><p class="section-intro">Music Short Factory transfers the file you confirm. TikTok's own editing flow remains the place where you set the caption, privacy, comments, Duet, Stitch, and the final publishing decision.</p><div class="inline-links"><a href="privacy.html">How data is handled</a><a href="support.html">Get support</a></div></div>
+        <div><p class="eyebrow">Creator control</p><h2 id="boundary-title">Nothing is sent without explicit confirmation.</h2></div>
+        <div><p class="section-intro">Draft upload sends the confirmed file to TikTok for completion in its app. Direct Post uses the latest account settings returned by TikTok and publishes only the caption, privacy, interaction, and disclosure choices the creator reviews here.</p><div class="inline-links"><a href="privacy.html">How data is handled</a><a href="support.html">Get support</a></div></div>
       </div>
     </section>
   </main>

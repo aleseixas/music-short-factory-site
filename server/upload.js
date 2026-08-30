@@ -80,7 +80,7 @@ export function createUploadMiddleware({ uploadDir, maxUploadBytes }) {
 
   return multer({
     storage,
-    limits: { fileSize: maxUploadBytes, files: 1, fields: 4 },
+    limits: { fileSize: maxUploadBytes, files: 1, fields: 16 },
     fileFilter: (_request, file, callback) => {
       if (!ALLOWED_VIDEO_MIME_TYPES.includes(file.mimetype)) {
         const error = new multer.MulterError("LIMIT_UNEXPECTED_FILE", "video");
@@ -137,6 +137,7 @@ export async function uploadVideoFile({
   tiktokClient,
   fetchImpl = globalThis.fetch,
   onInitialized = null,
+  initializeTransfer = null,
 }) {
   if (!ALLOWED_VIDEO_MIME_TYPES.includes(mimeType)) {
     throw new TypeError("Unsupported video MIME type");
@@ -144,12 +145,14 @@ export async function uploadVideoFile({
   if (typeof fetchImpl !== "function") throw new TypeError("fetch is required");
 
   const plan = createChunkPlan(videoSize);
-  const initialized = await tiktokClient.initializeUpload({
-    accessToken,
-    videoSize,
-    chunkSize: plan.chunkSize,
-    totalChunkCount: plan.totalChunkCount,
-  });
+  const initialize = initializeTransfer ||
+    ((transfer) => tiktokClient.initializeUpload(transfer));
+  const initialized = await initialize({
+      accessToken,
+      videoSize,
+      chunkSize: plan.chunkSize,
+      totalChunkCount: plan.totalChunkCount,
+    });
   const uploadUrl = validateUploadUrl(initialized.uploadUrl);
   if (onInitialized) await onInitialized({ publishId: initialized.publishId });
 

@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Terms of Service | Além do Hit</title>
-  <meta name="description" content="Terms governing the Além do Hit public pages, Music Short Factory creator workflow, TikTok connection, and confirmed draft uploads.">
+  <meta name="description" content="Terms governing the Além do Hit public pages, Music Short Factory creator workflow, TikTok connection, draft uploads, and Direct Post.">
   <meta name="theme-color" content="#090b0b">
   <link rel="canonical" href="https://aleseixas.github.io/music-short-factory-site/terms.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Além do Hit">
   <meta property="og:title" content="Terms of Service | Além do Hit">
-  <meta property="og:description" content="Terms for the Além do Hit creator tool, TikTok authorization, and creator-confirmed draft uploads.">
+  <meta property="og:description" content="Terms for the Além do Hit creator tool, TikTok authorization, draft uploads, and creator-confirmed Direct Post.">
   <meta property="og:url" content="https://aleseixas.github.io/music-short-factory-site/terms.html">
   <meta property="og:image" content="https://aleseixas.github.io/music-short-factory-site/assets/alem-do-hit-og.png">
   <meta property="og:image:width" content="1200">
@@ -35,8 +35,8 @@
       <div class="wrap page-hero-inner">
         <p class="eyebrow">Legal</p>
         <h1 id="terms-title">Terms of Service</h1>
-        <p class="lead">These Terms govern use of the Além do Hit public pages, support channel, Music Short Factory creator workflow, and its authorized TikTok draft-upload integration.</p>
-        <div class="page-meta" role="group" aria-label="Document dates"><span>Effective August 28, 2026</span><span>Last updated August 29, 2026</span></div>
+        <p class="lead">These Terms govern use of the Além do Hit public pages, support channel, Music Short Factory creator workflow, and its authorized TikTok publishing integration.</p>
+        <div class="page-meta" role="group" aria-label="Document dates"><span>Effective August 28, 2026</span><span>Last updated August 30, 2026</span></div>
       </div>
     </section>
 
@@ -44,14 +44,14 @@
       <div class="wrap legal-layout">
         <nav class="legal-toc" aria-label="On this page"><strong>On this page</strong><a href="#acceptance">Acceptance</a><a href="#project">The project</a><a href="#use">Acceptable use</a><a href="#content">Creator content</a><a href="#integrations">Platform integrations</a><a href="#ownership">Ownership</a><a href="#availability">Availability</a><a href="#disclaimers">Disclaimers</a><a href="#privacy">Privacy</a><a href="#changes">Changes</a><a href="#contact">Contact</a></nav>
         <article class="prose">
-          <div class="notice"><strong>Plain-language summary.</strong> Além do Hit provides a focused creator tool. Music Short Factory is its workflow for preparing, previewing, and sending a creator-confirmed video as a TikTok draft. The creator completes post settings and the final publication decision inside TikTok.</div>
+          <div class="notice"><strong>Plain-language summary.</strong> Além do Hit provides a focused creator tool. Music Short Factory lets a creator preview a video, then choose either a TikTok draft upload or Direct Post using settings available for the authorized account. Neither action occurs without explicit confirmation.</div>
 
           <h2 id="acceptance">1. Acceptance</h2>
           <p>By accessing this website or using a service or integration made available by the operator, you agree to these Terms and the <a href="privacy.html">Privacy Policy</a>. If you do not agree, do not use the relevant service or integration.</p>
 
           <h2 id="project">2. The tool and its workflow</h2>
-          <p>Além do Hit is a creator tool and editorial project for short-form educational and documentary music stories. Music Short Factory names the broader workflow from preparation to draft delivery. The current web tool accepts a creator-finished video and handles account authorization, local preview, explicit upload confirmation, and draft-delivery status.</p>
-          <p>The tool is intentionally limited. It does not create or edit the video in the browser, is not a substitute for TikTok's editor, and does not directly publish a post. Caption, privacy, interaction settings, and the final publication decision remain with the creator inside TikTok.</p>
+          <p>Além do Hit is a creator tool and editorial project for short-form educational and documentary music stories. Music Short Factory names the broader workflow from preparation to publishing. The current web tool accepts a creator-finished video and handles account authorization, local preview, explicit confirmation, draft upload or Direct Post, and publishing status.</p>
+          <p>The tool is intentionally limited and does not create or edit the video in the browser. For drafts, the creator completes post settings and the final decision inside TikTok. For Direct Post, the creator chooses from settings TikTok makes available for the authorized account and confirms the final publishing action in the tool.</p>
 
           <h2 id="use">3. Acceptable use</h2>
           <p>You may use the public pages and creator workflow only for lawful purposes. You must not use them to:</p>
@@ -69,8 +69,8 @@
           <p>Workflow guidance does not replace factual review, editorial judgment, rights clearance, or the creator's final publishing decision.</p>
 
           <h2 id="integrations">5. Platform integrations</h2>
-          <p>The creator tool uses TikTok Login Kit and requests <code>user.info.basic</code> to identify the account the creator authorizes. After the creator previews a selected video and explicitly confirms, the tool uses Content Posting API permission <code>video.upload</code> to send that video as a draft.</p>
-          <p>The tool does not request <code>video.publish</code> and does not Direct Post. The creator must open TikTok's inbox or editor to choose the caption, privacy, comments, and other settings available for the account and to decide whether to publish. The operator must not intentionally transfer content to an account that has not authorized access or without the creator's explicit confirmation.</p>
+          <p>The creator tool uses TikTok Login Kit and requests <code>user.info.basic</code> to identify the account the creator authorizes. It uses Content Posting API permission <code>video.upload</code> to send a creator-confirmed video as a draft and <code>video.publish</code> to query the account's current publishing options and complete a creator-confirmed Direct Post.</p>
+          <p>Before Direct Post, the tool loads creator information from TikTok and presents only the privacy and comments, Duet, Stitch, duration, and other restrictions returned for that account. The creator must preview the video, provide or review the caption, select available settings, complete any required content and music disclosures, and explicitly confirm publication. The operator must not intentionally transfer content to an account that has not authorized access or without the creator's explicit confirmation.</p>
           <p>The integration may be limited to approved or sandbox users while TikTok development review, configuration, or audit requirements are in progress. TikTok may impose format, size, rate, account, or availability restrictions.</p>
           <p>TikTok and other third-party services are governed by their own terms, policies, availability, and account controls. Além do Hit is not affiliated with, endorsed by, or sponsored by TikTok.</p>
 
@@ -81,7 +81,7 @@
           <p>The public pages, creator workflow, support channel, and integration may change or be interrupted. The operator may limit or end access where reasonably necessary for security, compliance, maintenance, platform requirements, or protection of the project and third parties.</p>
 
           <h2 id="disclaimers">8. Disclaimers and responsibility</h2>
-          <p>The public pages and creator workflow are provided on an “as is” and “as available” basis to the extent permitted by law. No guarantee is made that all information will be error-free, that TikTok will accept or finish processing a draft, that the integration will remain available, or that use will result in platform approval, publication, reach, or audience performance.</p>
+          <p>The public pages and creator workflow are provided on an “as is” and “as available” basis to the extent permitted by law. No guarantee is made that all information will be error-free, that TikTok will accept or finish processing a draft or Direct Post, that the integration will remain available, or that use will result in platform approval, publication, reach, or audience performance.</p>
           <p>To the extent permitted by applicable law, the operator is not responsible for indirect, incidental, special, or consequential losses arising from use of or inability to use the website, workflow, or a third-party platform. Nothing in these Terms excludes responsibility that cannot lawfully be excluded.</p>
 
           <h2 id="privacy">9. Privacy</h2>
@@ -100,7 +100,7 @@
 
   <footer class="site-footer">
     <div class="wrap footer-main">
-      <div class="footer-brand"><a class="brand" href="index.html" aria-label="Além do Hit home"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-copy"><strong>Além do Hit</strong><small>Music stories with context</small></span></a><p>A creator tool for short-form music stories. Music Short Factory is its preparation, review, and draft-delivery workflow.</p></div>
+      <div class="footer-brand"><a class="brand" href="index.html" aria-label="Além do Hit home"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-copy"><strong>Além do Hit</strong><small>Music stories with context</small></span></a><p>A creator tool for short-form music stories. Music Short Factory is its preparation, review, and publishing workflow.</p></div>
       <div class="footer-column"><strong>Explore</strong><a href="index.html">Home</a><a href="about.html">About &amp; How It Works</a><a href="app.html">Creator tool</a><a href="support.html">Support</a></div>
       <div class="footer-column"><strong>Privacy</strong><a href="privacy.html">Privacy Policy</a><a href="data-deletion.html">Data Deletion</a><a href="mailto:alelseixas@gmail.com">Contact</a></div>
       <div class="footer-column"><strong>Legal</strong><a href="terms.html" aria-current="page">Terms of Service</a><a href="privacy.html">Privacy Policy</a></div>

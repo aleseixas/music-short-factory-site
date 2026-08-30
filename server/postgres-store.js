@@ -43,6 +43,7 @@ const SCHEMA_SQL = `
     session_hash TEXT NOT NULL
       REFERENCES sessions(session_hash) ON DELETE CASCADE ON UPDATE CASCADE,
     status TEXT NOT NULL,
+    publish_mode TEXT NOT NULL DEFAULT 'draft',
     uploaded_bytes BIGINT NOT NULL DEFAULT 0,
     fail_reason TEXT,
     created_at BIGINT NOT NULL,
@@ -51,6 +52,9 @@ const SCHEMA_SQL = `
 
   CREATE INDEX IF NOT EXISTS publishes_session_updated
     ON publishes(session_hash, updated_at DESC);
+
+  ALTER TABLE publishes
+    ADD COLUMN IF NOT EXISTS publish_mode TEXT NOT NULL DEFAULT 'draft';
 `;
 
 function storedInteger(value, name) {
@@ -384,16 +388,25 @@ export async function createPostgresStore({
     sessionId,
     publishId,
     status = "PROCESSING_UPLOAD",
+    mode = "draft",
   ) {
     const key = sessionHash(sessionId);
     if (!key) throw new Error("Session not found");
     const currentTime = now();
     const result = await pool.query(
       `INSERT INTO publishes
-         (publish_id, session_hash, status, uploaded_bytes, created_at, updated_at)
-       VALUES ($1, $2, $3, 0, $4, $5)
+         (publish_id, session_hash, status, publish_mode, uploaded_bytes,
+          created_at, updated_at)
+       VALUES ($1, $2, $3, $4, 0, $5, $6)
        RETURNING *`,
-      [publishId, key, status, currentTime, currentTime],
+      [
+        publishId,
+        key,
+        status,
+        mode === "direct" ? "direct" : "draft",
+        currentTime,
+        currentTime,
+      ],
     );
     return serializePublish(result.rows[0]);
   }

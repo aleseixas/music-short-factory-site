@@ -127,3 +127,46 @@ test("chunk upload retries 5xx and rejects a non-final success code", async () =
     await rm(directory, { recursive: true, force: true });
   }
 });
+
+test("video transfer can reuse chunk upload with a Direct Post initializer", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "adh-direct-upload-test-"));
+  const filePath = join(directory, "video.mp4");
+  const contents = Buffer.alloc(1024, 5);
+  await writeFile(filePath, contents);
+  let directInput = null;
+
+  try {
+    const result = await uploadVideoFile({
+      filePath,
+      videoSize: contents.length,
+      mimeType: "video/mp4",
+      accessToken: "act.direct",
+      tiktokClient: {
+        initializeUpload: async () => {
+          throw new Error("draft initializer must not run");
+        },
+      },
+      initializeTransfer: async (input) => {
+        directInput = input;
+        return {
+          publishId: "v_pub_file~v2.transfer-test",
+          uploadUrl:
+            "https://open-upload.tiktokapis.com/video/?upload_id=direct&upload_token=opaque",
+        };
+      },
+      fetchImpl: async (_url, options) => {
+        for await (const _chunk of options.body) {
+          // Consume the upload stream.
+        }
+        return new Response(null, { status: 201 });
+      },
+    });
+
+    assert.equal(directInput.accessToken, "act.direct");
+    assert.equal(directInput.videoSize, 1024);
+    assert.equal(directInput.totalChunkCount, 1);
+    assert.equal(result.publishId, "v_pub_file~v2.transfer-test");
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});

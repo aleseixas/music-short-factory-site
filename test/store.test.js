@@ -66,10 +66,19 @@ test("sessions use one-time OAuth state and rotate after authorization", () => {
       "v_inbox_file~v2.test",
     );
     assert.equal(publish.status, "PROCESSING_UPLOAD");
+    assert.equal(publish.mode, "draft");
     assert.equal(
       store.getSession(connected.sessionId).lastPublish.publishId,
       "v_inbox_file~v2.test",
     );
+
+    const directPublish = store.recordPublish(
+      connected.sessionId,
+      "v_pub_file~v2.test",
+      "UPLOADING",
+      "direct",
+    );
+    assert.equal(directPublish.mode, "direct");
 
     currentTime += 61_000;
     assert.equal(store.getSession(connected.sessionId), null);

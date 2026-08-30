@@ -19,16 +19,22 @@ function baseEnv(overrides = {}) {
   };
 }
 
-test("configuration fixes the least-privilege TikTok scopes", () => {
+test("configuration fixes the TikTok scopes used by draft and Direct Post", () => {
   const config = createConfig(baseEnv(), process.cwd());
-  assert.deepEqual(config.scopes, ["user.info.basic", "video.upload"]);
+  assert.deepEqual(config.scopes, [
+    "user.info.basic",
+    "video.upload",
+    "video.publish",
+  ]);
   assert.deepEqual(REQUIRED_TIKTOK_SCOPES, [
     "user.info.basic",
     "video.upload",
+    "video.publish",
   ]);
   assert.equal(config.cookieName, "adh_session");
   assert.equal(config.cookieSecure, false);
   assert.equal(config.databaseUrl, null);
+  assert.equal(config.directPostAudited, false);
 });
 
 test("production requires HTTPS and a same-origin callback", () => {
