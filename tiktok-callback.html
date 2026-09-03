@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>TikTok authorization | Além do Hit</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .oauth-shell{min-height:100vh;display:grid;place-items:center;padding:32px 20px;background:#090b0b;color:#fff}
+    .oauth-card{width:min(720px,100%);background:#111414;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+    .oauth-card h1{margin:0 0 12px;font-size:clamp(2rem,5vw,3.25rem)}
+    .oauth-card p{line-height:1.6;color:rgba(255,255,255,.8)}
+    .oauth-status{margin:24px 0;padding:16px 18px;border-radius:14px;background:rgba(255,255,255,.06)}
+    .oauth-code{display:none;margin-top:18px}
+    .oauth-code label{display:block;margin-bottom:8px;font-weight:700}
+    .oauth-code-row{display:flex;gap:10px;align-items:stretch}
+    .oauth-code input{min-width:0;flex:1;padding:13px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:#080a0a;color:#fff;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+    .oauth-code button,.oauth-home{border:0;border-radius:12px;padding:13px 16px;font:inherit;font-weight:700;cursor:pointer}
+    .oauth-code button{background:#fff;color:#090b0b}
+    .oauth-home{display:inline-block;margin-top:20px;text-decoration:none;background:#fe2c55;color:#fff}
+    .oauth-note{font-size:.92rem;color:rgba(255,255,255,.62)!important}
+  </style>
+</head>
+<body>
+  <main class="oauth-shell">
+    <section class="oauth-card" aria-labelledby="oauth-title">
+      <p class="eyebrow">TikTok Login Kit</p>
+      <h1 id="oauth-title">Authorization return</h1>
+      <p id="oauth-summary">Reading the authorization response from TikTok…</p>
+
+      <div class="oauth-status" id="oauth-status" role="status" aria-live="polite">Please wait.</div>
+
+      <div class="oauth-code" id="oauth-code-block">
+        <label for="oauth-code">Authorization code</label>
+        <div class="oauth-code-row">
+          <input id="oauth-code" type="text" readonly autocomplete="off" spellcheck="false">
+          <button id="copy-code" type="button">Copy code</button>
+        </div>
+        <p class="oauth-note">This code is temporary. Paste it only into your local OAuth setup for Music Short Factory. Do not publish or share it.</p>
+      </div>
+
+      <a class="oauth-home" href="index.html">Back to Além do Hit</a>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+      const state = params.get('state');
+      const error = params.get('error');
+      const errorDescription = params.get('error_description') || params.get('error_description');
+
+      const summary = document.getElementById('oauth-summary');
+      const status = document.getElementById('oauth-status');
+      const block = document.getElementById('oauth-code-block');
+      const input = document.getElementById('oauth-code');
+      const copy = document.getElementById('copy-code');
+
+      if (error) {
+        summary.textContent = 'TikTok did not complete the authorization.';
+        status.textContent = errorDescription ? `${error}: ${errorDescription}` : error;
+      } else if (code) {
+        summary.textContent = 'TikTok returned an authorization code successfully.';
+        status.textContent = state
+          ? 'Authorization received. State was also returned for verification.'
+          : 'Authorization received.';
+        input.value = code;
+        block.style.display = 'block';
+
+        // Remove the temporary code from the visible URL after reading it.
+        history.replaceState({}, document.title, window.location.pathname);
+
+        copy.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(code);
+            copy.textContent = 'Copied';
+          } catch (_) {
+            input.focus();
+            input.select();
+            document.execCommand('copy');
+            copy.textContent = 'Copied';
+          }
+          setTimeout(() => { copy.textContent = 'Copy code'; }, 1800);
+        });
+      } else {
+        summary.textContent = 'No TikTok authorization response was found.';
+        status.textContent = 'Start the TikTok Login Kit authorization flow first, then TikTok will return you to this page.';
+      }
+    })();
+  </script>
+</body>
+</html>
