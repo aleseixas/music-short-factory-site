@@ -434,16 +434,29 @@ function renderCommercialSettings() {
   }
 
   const privateVisibility = ui.privacy.value === "SELF_ONLY";
+  if (privateVisibility && ui.brandContent.checked) {
+    ui.brandContent.checked = false;
+  }
+
   ui.brandContent.disabled = privateVisibility;
   ui.brandContentLabel.classList.toggle("is-disabled", privateVisibility);
-  if (privateVisibility) ui.brandContent.checked = false;
 
-  if (disclosureOn && !ui.brandOrganic.checked && !ui.brandContent.checked) {
+  const selfOnlyOption = [...ui.privacy.options].find(
+    (option) => option.value === "SELF_ONLY",
+  );
+  if (selfOnlyOption) {
+    selfOnlyOption.disabled = ui.brandContent.checked;
+  }
+
+  if (privateVisibility) {
+    ui.commercialHelp.textContent =
+      "Branded content is unavailable with Only me visibility. Choose another privacy option to enable it.";
+  } else if (disclosureOn && !ui.brandOrganic.checked && !ui.brandContent.checked) {
     ui.commercialHelp.textContent =
       "Choose Your brand, Branded content, or both before publishing.";
   } else if (ui.brandContent.checked) {
     ui.commercialHelp.textContent =
-      "This video will be labeled as Paid partnership.";
+      "This video will be labeled as Paid partnership. Only me is unavailable while Branded content is selected.";
   } else if (ui.brandOrganic.checked) {
     ui.commercialHelp.textContent =
       "This video will be labeled as Promotional content.";
