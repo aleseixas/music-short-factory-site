@@ -163,6 +163,7 @@ function directPostSettings(creatorInfo, audited) {
   const directPostAllowed = privateAccount && supportsPrivateView;
   return {
     ...creatorInfo,
+    reportedPrivacyLevelOptions: returnedOptions,
     privacyLevelOptions: directPostAllowed
       ? returnedOptions.filter((option) => option === "SELF_ONLY")
       : [],
