@@ -344,6 +344,7 @@ test("connected creator loads current settings and completes Direct Post", async
     form.append("commercialContent", "false");
     form.append("brandOrganic", "false");
     form.append("brandContent", "false");
+    form.append("isAigc", "true");
     form.append("videoDurationSeconds", "30");
     return form;
   }
@@ -390,6 +391,7 @@ test("connected creator loads current settings and completes Direct Post", async
     assert.equal(directInitialization.postInfo.disableComment, false);
     assert.equal(directInitialization.postInfo.disableDuet, true);
     assert.equal(directInitialization.postInfo.disableStitch, true);
+    assert.equal(directInitialization.postInfo.isAigc, true);
     assert.equal(creatorInfoQueries, 3);
 
     const status = await fetch(

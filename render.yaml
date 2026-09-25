@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: alem-do-hit-music-short-factory
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "1"
+      - key: UPLOAD_DIR
+        value: /tmp/adh-uploads
+      - key: MAX_UPLOAD_BYTES
+        value: "536870912"
+      - key: TIKTOK_DIRECT_POST_AUDITED
+        value: "0"
+      - key: PUBLIC_ORIGIN
+        sync: false
+      - key: TIKTOK_REDIRECT_URI
+        sync: false
+      - key: TIKTOK_CLIENT_KEY
+        sync: false
+      - key: TIKTOK_CLIENT_SECRET
+        sync: false
+      - key: TOKEN_ENCRYPTION_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false

@@ -326,6 +326,7 @@ export function createTikTokClient({
           disable_stitch: postInfo.disableStitch,
           brand_content_toggle: postInfo.brandContentToggle,
           brand_organic_toggle: postInfo.brandOrganicToggle,
+          is_aigc: postInfo.isAigc,
         },
         source_info: {
           source: "FILE_UPLOAD",

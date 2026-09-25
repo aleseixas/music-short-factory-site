@@ -26,7 +26,7 @@
     <div class="wrap header-inner">
       <a class="brand" href="index.html" aria-label="Além do Hit home"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-copy"><strong>Além do Hit</strong><small>Music stories with context</small></span></a>
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Toggle navigation"><span></span></button>
-      <nav class="site-nav" id="primary-navigation" aria-label="Primary" data-open="false"><a href="index.html">Home</a><a href="about.html">About &amp; How It Works</a><a href="support.html">Support</a><a class="nav-contact" href="app.html">Open creator tool</a></nav>
+      <nav class="site-nav" id="primary-navigation" aria-label="Primary" data-open="false"><a href="index.html">Home</a><a href="about.html">How it works</a><a class="nav-contact" href="app.html">Publish</a><a href="privacy.html" aria-current="page">Privacy Policy</a><a href="terms.html">Terms</a><a href="support.html">Support</a></nav>
     </div>
   </header>
 
@@ -62,7 +62,7 @@
             <tr><td><strong>Creator materials</strong></td><td>The video file a creator deliberately selects for preview and transfer, plus its caption and basic file information needed to validate and send it.</td></tr>
             <tr><td><strong>Authorized TikTok account information</strong></td><td>TikTok account identifiers and limited basic profile information returned under <code>user.info.basic</code>, plus creator-specific publishing options and restrictions returned by TikTok before Direct Post.</td></tr>
             <tr><td><strong>Authorization information</strong></td><td>OAuth access and refresh tokens, granted scopes, expiration, and connection state. Tokens are encrypted on the server using authenticated encryption.</td></tr>
-            <tr><td><strong>Publishing information</strong></td><td>The selected publishing mode, video, caption, privacy level, permitted comments, Duet and Stitch choices, required content disclosures, TikTok publishing identifier, status, and transfer timestamps.</td></tr>
+            <tr><td><strong>Publishing information</strong></td><td>The selected publishing mode, video, caption, privacy level, permitted comments, Duet and Stitch choices, AI-generated and commercial-content disclosures, TikTok publishing identifier, status, and transfer timestamps.</td></tr>
             <tr><td><strong>Operational information</strong></td><td>Application events, non-sensitive diagnostic messages, request metadata, security events, and technical logs needed to operate and troubleshoot the service.</td></tr>
           </tbody></table></div>
           <p>Do not send passwords, authorization codes, tokens, client secrets, or other unnecessary credentials in a support message.</p>
@@ -82,8 +82,8 @@
 
           <h2 id="tiktok">4. TikTok integration</h2>
           <p>The creator tool uses TikTok Login Kit to connect an account chosen by the creator. It requests <code>user.info.basic</code> to identify and display that account, <code>video.upload</code> to send a creator-confirmed video as a draft, and <code>video.publish</code> to load creator-specific publishing options and perform a creator-confirmed Direct Post.</p>
-          <p>For Direct Post, the backend queries TikTok's creator information before publishing. The tool shows only the privacy options and comments, Duet, Stitch, duration, and other restrictions TikTok returns for the authorized account. The creator previews the video, edits the caption, chooses from those available settings, completes any required content and music disclosures, and explicitly confirms before the video is sent.</p>
-          <p>For a draft upload, the creator completes the caption and final settings inside TikTok. For Direct Post, the creator makes that decision in the tool immediately before selecting <strong>Publish directly</strong>. Além do Hit does not send a draft or publish directly without the creator's action and confirmation.</p>
+          <p>For Direct Post, the backend queries TikTok's creator information before publishing. The tool shows only the privacy options and comments, Duet, Stitch, duration, and other restrictions TikTok returns for the authorized account. The creator previews the video, edits the caption, chooses from those available settings, sets applicable AI-generated and commercial-content disclosures, accepts the relevant TikTok declarations, and explicitly confirms before the video is sent.</p>
+          <p>For a draft upload, the creator completes the caption and final settings inside TikTok. For Direct Post, the creator makes that decision in the tool immediately before clicking <strong>Post to TikTok</strong>. Além do Hit does not send a draft or publish directly without the creator's action and confirmation.</p>
           <p>TikTok client credentials and OAuth tokens are never placed in the public frontend. Access and refresh tokens are encrypted at rest on the backend.</p>
 
           <h2 id="cookies">5. Essential cookie</h2>
@@ -134,7 +134,7 @@
   <footer class="site-footer">
     <div class="wrap footer-main">
       <div class="footer-brand"><a class="brand" href="index.html" aria-label="Além do Hit home"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-copy"><strong>Além do Hit</strong><small>Music stories with context</small></span></a><p>A creator tool for short-form music stories. Music Short Factory is its preparation, review, and publishing workflow.</p></div>
-      <div class="footer-column"><strong>Explore</strong><a href="index.html">Home</a><a href="about.html">About &amp; How It Works</a><a href="app.html">Creator tool</a><a href="support.html">Support</a></div>
+      <div class="footer-column"><strong>Explore</strong><a href="index.html">Home</a><a href="about.html">How it works</a><a href="app.html">Publish</a><a href="support.html">Support</a></div>
       <div class="footer-column"><strong>Privacy</strong><a href="privacy.html" aria-current="page">Privacy Policy</a><a href="data-deletion.html">Data Deletion</a><a href="mailto:alelseixas@gmail.com">Contact</a></div>
       <div class="footer-column"><strong>Legal</strong><a href="terms.html">Terms of Service</a><a href="privacy.html" aria-current="page">Privacy Policy</a></div>
     </div>

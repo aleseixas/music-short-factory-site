@@ -660,6 +660,7 @@ export async function createApp({
           );
           const brandOrganicToggle = bodyBoolean(req.body, "brandOrganic");
           const brandContentToggle = bodyBoolean(req.body, "brandContent");
+          const isAigc = bodyBoolean(req.body, "isAigc");
           if (
             (!commercialContent &&
               (brandOrganicToggle || brandContentToggle)) ||
@@ -694,6 +695,7 @@ export async function createApp({
                   latestCreatorInfo.stitchDisabled || !allowStitch,
                 brandContentToggle,
                 brandOrganicToggle,
+                isAigc,
               },
             });
         }

@@ -32,6 +32,7 @@ const ui = {
   allowComment: document.querySelector("#allow-comment"),
   allowDuet: document.querySelector("#allow-duet"),
   allowStitch: document.querySelector("#allow-stitch"),
+  aiGenerated: document.querySelector("#ai-generated"),
   commercialContent: document.querySelector("#commercial-content"),
   commercialOptions: document.querySelector("#commercial-options"),
   brandOrganic: document.querySelector("#brand-organic"),
@@ -411,6 +412,7 @@ function resetCreatorInfo() {
   ui.commercialContent.checked = false;
   ui.brandOrganic.checked = false;
   ui.brandContent.checked = false;
+  ui.aiGenerated.checked = false;
   renderCommercialSettings();
   for (const interaction of [
     ui.allowComment,
@@ -530,7 +532,7 @@ function setPublishMode(mode) {
     ? "TikTok provides the account-specific settings below. The post starts only after your explicit confirmation."
     : "This action uploads the selected video to the authorized account's TikTok inbox. It does not publish automatically.";
   ui.uploadButton.textContent = direct
-    ? "Publish directly"
+    ? "Post to TikTok"
     : "Send to TikTok drafts";
   invalidateConsent();
   if (direct) void loadCreatorInfo();
@@ -570,6 +572,7 @@ function uploadSelectedFile() {
     );
     formData.append("brandOrganic", String(ui.brandOrganic.checked));
     formData.append("brandContent", String(ui.brandContent.checked));
+    formData.append("isAigc", String(ui.aiGenerated.checked));
     formData.append(
       "videoDurationSeconds",
       String(appState.videoDurationSeconds),
@@ -708,6 +711,7 @@ for (const interaction of [
   ui.allowComment,
   ui.allowDuet,
   ui.allowStitch,
+  ui.aiGenerated,
 ]) {
   interaction.addEventListener("change", invalidateConsent);
 }

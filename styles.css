@@ -1824,6 +1824,37 @@ div.account-avatar {
   background: rgba(217, 255, 87, 0.07);
 }
 
+@media (max-width: 1100px) {
+  .js .nav-toggle {
+    display: flex;
+  }
+
+  .site-nav {
+    position: absolute;
+    top: calc(100% + 1px);
+    right: 16px;
+    left: 16px;
+    display: grid;
+    padding: 10px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #111515;
+    box-shadow: var(--shadow);
+  }
+
+  .js .site-nav[data-open="false"] {
+    display: none;
+  }
+
+  .site-nav a {
+    padding: 12px;
+  }
+
+  .site-nav .nav-contact {
+    margin-left: 0;
+  }
+}
+
 @media (max-width: 960px) {
   .hero {
     min-height: auto;

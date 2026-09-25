@@ -9,6 +9,7 @@ RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 
 COPY . .
 
+RUN npm test
 RUN mkdir -p /tmp/adh-uploads && chown -R node:node /app /tmp/adh-uploads
 
 USER node

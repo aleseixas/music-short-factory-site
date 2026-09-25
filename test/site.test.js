@@ -92,6 +92,24 @@ test("homepage exposes legal policies and sitemap contains every review page", a
   assert.match(home, /class="legal-direct"[\s\S]*href="terms\.html"/i);
   assert.match(home, /class="legal-direct"[\s\S]*href="privacy\.html"/i);
 
+  const primaryNavigation = home.match(
+    /<nav class="site-nav"[\s\S]*?<\/nav>/i,
+  )?.[0];
+  assert.ok(primaryNavigation, "homepage: missing primary navigation");
+  for (const [href, label] of [
+    ["index.html", "Home"],
+    ["about.html", "How it works"],
+    ["app.html", "Publish"],
+    ["privacy.html", "Privacy Policy"],
+    ["terms.html", "Terms"],
+    ["support.html", "Support"],
+  ]) {
+    assert.match(
+      primaryNavigation,
+      new RegExp(`href="${href.replace(".", "\\.")}"[^>]*>${label}<`, "i"),
+    );
+  }
+
   const sitemap = await readFile(join(ROOT, "sitemap.xml"), "utf8");
   for (const page of [
     "about.html",
@@ -110,8 +128,12 @@ test("creator page offers draft and Direct Post without hardcoded privacy option
   const script = await readFile(join(ROOT, "app.js"), "utf8");
   assert.match(app, /name="publish-mode" value="draft"/);
   assert.match(app, /name="publish-mode" value="direct"/);
+  assert.match(app, /id="connect-link"[^>]*>Continue with TikTok/);
   assert.match(app, /id="privacy-level"/);
   assert.doesNotMatch(app, /<option[^>]+value="(?:SELF_ONLY|PUBLIC_TO_EVERYONE|MUTUAL_FOLLOW_FRIENDS|FOLLOWER_OF_CREATOR)"/);
   assert.match(script, /requestJson\("\/api\/creator-info"/);
   assert.match(app, /Music Usage Confirmation/);
+  assert.match(app, /id="ai-generated"/);
+  assert.match(script, /formData\.append\("isAigc"/);
+  assert.match(script, /"Post to TikTok"/);
 });

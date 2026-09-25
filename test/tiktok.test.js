@@ -200,6 +200,7 @@ test("TikTok client queries creator settings and initializes Direct Post", async
       disableStitch: true,
       brandContentToggle: false,
       brandOrganicToggle: true,
+      isAigc: true,
     },
   });
   assert.equal(initialized.publishId, "v_pub_file~v2.direct-test");
@@ -216,6 +217,7 @@ test("TikTok client queries creator settings and initializes Direct Post", async
       disable_stitch: true,
       brand_content_toggle: false,
       brand_organic_toggle: true,
+      is_aigc: true,
     },
     source_info: {
       source: "FILE_UPLOAD",

@@ -11,7 +11,7 @@ This project supports both publishing modes exposed by TikTok's Content Posting 
 - Product access: Login Kit and Content Posting API.
 - Scopes: `user.info.basic`, `video.upload`, and `video.publish`.
 - **Send as draft:** a creator-confirmed video is delivered to the authorized account through `video.upload`; the creator completes the post inside TikTok.
-- **Publish directly:** the tool calls `creator_info/query`, shows only the privacy and interaction options currently returned for the authorized account, collects the required confirmations and disclosures, and sends the creator-confirmed post through `video.publish`.
+- **Publish directly:** the tool calls `creator_info/query`, shows only the privacy and interaction options currently returned for the authorized account, collects the editable caption plus AI-generated and commercial-content disclosures, and sends the creator-confirmed post through `video.publish` only after **Post to TikTok** is clicked.
 - Both modes use the same secure OAuth connection, temporary media transfer, `publish_id`, and status workflow.
 
 Direct Post remains subject to TikTok's audit and account restrictions. In an unaudited client, target accounts must be private, available privacy is restricted to `SELF_ONLY`, content remains private, and TikTok applies additional user and posting caps.
@@ -163,8 +163,9 @@ Recommended sequence:
 
 1. Create the Neon Free database and copy its PostgreSQL connection URL without
    placing it in a local file or Git.
-2. Connect the GitHub repository and `main` branch to a Render Web Service using
-   the existing Dockerfile and the Free instance type.
+2. Create a Render Blueprint from the repository's `render.yaml` (or configure a
+   Web Service manually with the same Dockerfile, Free instance, environment,
+   and `/api/health` health check).
 3. Do not create a persistent disk, Redis, Key Value instance, or media storage.
 4. Configure Render secrets for `DATABASE_URL`, the TikTok credentials, and
    `TOKEN_ENCRYPTION_KEY`.
@@ -219,7 +220,7 @@ Before recording the review video:
 6. Select a small, rights-cleared test video and play the local preview.
 7. Test **Send as draft**, confirm the button remains disabled until explicit consent, and verify delivery to the TikTok inbox.
 8. Select **Publish directly** and confirm the tool loads the creator name, privacy options, interaction availability, and duration limit from TikTok rather than using a fixed list.
-9. Choose an available privacy option, keep comments, Duet, and Stitch unchecked unless deliberately enabled, complete the required disclosure and music confirmations, and publish only after explicit confirmation.
+9. Choose an available privacy option; set caption, permitted interactions, AI-generated status, and any applicable commercial disclosure; accept the displayed TikTok declaration; then click **Post to TikTok**.
 10. Follow the returned `publish_id` until TikTok reports a terminal status, then verify the private Direct Post on the authorized Sandbox account.
 11. Return to the tool and demonstrate Disconnect TikTok or Delete my data.
 
@@ -237,7 +238,7 @@ Record one clear, continuous flow that shows:
 6. the choice between draft and Direct Post, plus the explicit consent control and creator-initiated action;
 7. real upload progress and the status returned through Content Posting API;
 8. a draft arriving in that creator's TikTok inbox or editor;
-9. for Direct Post, Creator Info options loaded for the same account, editable caption, selected privacy and permitted interaction settings, required disclosures, and final confirmation;
+9. for Direct Post, Creator Info options loaded for the same account, editable caption, selected privacy and permitted interaction settings, the AI-generated option, applicable commercial disclosures, the consent declaration, and the final **Post to TikTok** click;
 10. the real Direct Post status and private post on the authorized Sandbox account; and
 11. revocation or deletion controls if the review form asks for them.
 
@@ -248,7 +249,7 @@ The recording must demonstrate a real Sandbox transaction. Do not replace a fail
 - One creator-controlled TikTok connection per browser session.
 - One local video selected and confirmed per transfer.
 - Draft upload and creator-confirmed Direct Post only; no unattended or scheduled publication.
-- Draft settings remain in TikTok. Direct Post shows an editable caption and only the privacy, comments, Duet, Stitch, duration, and disclosure controls permitted by TikTok for the connected creator.
+- Draft settings remain in TikTok. Direct Post shows an editable caption, TikTok-returned privacy, comments, Duet, Stitch and duration controls, plus AI-generated and commercial-content disclosures.
 - Until TikTok audits Direct Post, it is limited to private target accounts and `SELF_ONLY` posts under TikTok's development restrictions.
 - No payments, subscriptions, teams, analytics dashboard, social feed, or administrative product area.
 - No permanent media library; selected videos are normally deleted immediately after the transfer attempt, with startup/hourly cleanup for recognized temporary files older than six hours.
@@ -292,6 +293,7 @@ TikTok approval is not guaranteed by the website or implementation. Approval als
 - [ ] Draft upload and Direct Post are disabled until their explicit confirmations are complete.
 - [ ] Real draft upload reaches the authorized TikTok inbox.
 - [ ] Direct Post options come from Creator Info for the connected account.
+- [ ] Direct Post sends the selected `is_aigc` value and applicable commercial disclosures only after the explicit **Post to TikTok** action.
 - [ ] A real private Direct Post completes in Sandbox under unaudited-client restrictions.
 - [ ] Disconnect and data deletion work.
 - [ ] Temporary uploaded video is removed from the backend.
