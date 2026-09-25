@@ -288,7 +288,7 @@ test("connected creator loads current settings and completes Direct Post", async
         username: "private_creator",
         nickname: "Private Sandbox Creator",
         privacyLevelOptions: [
-          "FOLLOWER_OF_CREATOR",
+          "PUBLIC_TO_EVERYONE",
           "MUTUAL_FOLLOW_FRIENDS",
           "SELF_ONLY",
         ],
