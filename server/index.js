@@ -149,6 +149,7 @@ function directPostSettings(creatorInfo, audited) {
   if (audited) {
     return {
       ...creatorInfo,
+      reportedPrivacyLevelOptions: returnedOptions,
       privacyLevelOptions: returnedOptions,
       directPostAllowed: true,
       unaudited: false,
@@ -156,22 +157,16 @@ function directPostSettings(creatorInfo, audited) {
     };
   }
 
-  const privateAccount =
-    returnedOptions.includes("FOLLOWER_OF_CREATOR") &&
-    !returnedOptions.includes("PUBLIC_TO_EVERYONE");
   const supportsPrivateView = returnedOptions.includes("SELF_ONLY");
-  const directPostAllowed = privateAccount && supportsPrivateView;
   return {
     ...creatorInfo,
     reportedPrivacyLevelOptions: returnedOptions,
-    privacyLevelOptions: directPostAllowed
-      ? returnedOptions.filter((option) => option === "SELF_ONLY")
-      : [],
-    directPostAllowed,
+    privacyLevelOptions: supportsPrivateView ? ["SELF_ONLY"] : [],
+    directPostAllowed: supportsPrivateView,
     unaudited: true,
-    restrictionReason: directPostAllowed
-      ? "This unaudited client can publish only to a private account with Only me visibility."
-      : "TikTok requires a private target account while this Direct Post client is unaudited.",
+    restrictionReason: supportsPrivateView
+      ? "This unaudited client is limited to Only me visibility. TikTok will enforce any additional account eligibility restrictions when the post is initialized."
+      : "TikTok did not return Only me as an available privacy option for this account.",
   };
 }
 
