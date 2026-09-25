@@ -472,7 +472,13 @@ function renderCreatorInfo(creator) {
   ui.directAccountName.textContent = creator.username
     ? `${creator.nickname} (@${creator.username})`
     : creator.nickname;
-  ui.directAccountLimit.textContent = `Maximum video duration returned by TikTok: ${creator.maxVideoPostDurationSec} seconds.`;
+  const reportedPrivacyOptions =
+    Array.isArray(creator.reportedPrivacyLevelOptions) &&
+    creator.reportedPrivacyLevelOptions.length
+      ? creator.reportedPrivacyLevelOptions.join(", ")
+      : "(none)";
+  ui.directAccountLimit.textContent =
+    `Maximum video duration returned by TikTok: ${creator.maxVideoPostDurationSec} seconds. Privacy options returned by TikTok: ${reportedPrivacyOptions}.`;
 
   const placeholder = document.createElement("option");
   placeholder.value = "";
